@@ -133,3 +133,83 @@ Returned when the email doesn't correspond to any user, or the password doesn't 
   "message": "Invalid email and password"
 }
 ```
+
+---
+
+## Get User Profile Endpoint
+
+Retrieves the authenticated user's profile information.
+
+### Endpoint
+`GET /api/users/profile`
+
+### Request Headers / Cookies
+- Requires a valid JWT token passed either in the `Authorization` header (`Bearer [JWT_TOKEN]`) or in the `token` cookie.
+
+### Responses
+
+#### 200 OK (Success)
+Returned when the user's profile is successfully fetched.
+```json
+{
+    "message": "User profile fetched successfully",
+    "user": {
+        "fullname": {
+            "firstname": "[FIRSTNAME]",
+            "lastname": "[LASTNAME]"
+        },
+        "_id": "[USER_ID]",
+        "email": "[EMAIL_ADDRESS]",
+        "createdAt": "[DATE]",
+        "updatedAt": "[DATE]",
+    }
+}
+```
+
+#### 401 Unauthorized
+Returned if no token is provided, the token is invalid, the token has been blacklisted, or the user no longer exists.
+```json
+{
+  "message": "Unauthorized Token" 
+}
+```
+*(Errors may also be "Token is blacklisted" or "Unauthorized User" depending on the reason)*
+
+---
+
+## Logout User Endpoint
+
+Logs out the user by adding their current token to the blacklist and clearing the token cookie.
+
+### Endpoints
+`GET /api/users/logout`
+`POST /api/users/logout`
+
+### Request Headers / Cookies
+- Requires a valid JWT token passed either in the `Authorization` header (`Bearer [JWT_TOKEN]`) or in the `token` cookie.
+
+### Responses
+
+#### 200 OK (Success)
+Returned when the user is successfully logged out.
+```json
+{
+  "message": "User logged out successfully"
+}
+```
+
+#### 400 Bad Request
+Returned if no token is provided in the request at all.
+```json
+{
+  "message": "No token provided"
+}
+```
+
+#### 401 Unauthorized
+Returned if the provided token is invalid or already blacklisted.
+```json
+{
+  "message": "Unauthorized Token"
+}
+```
