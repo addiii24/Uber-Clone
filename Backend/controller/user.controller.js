@@ -68,3 +68,8 @@ export const login = async (req, res) => {
         token 
     });
 }
+
+export const getuserprofile = async (req, res) => {
+    
+}
+        
