@@ -96,10 +96,23 @@ export const userprofile = async (req, res) => {
 }
 
 export const logout = async (req,res) => {
-    res.clearCookie("token");
-    const token = req.token;
+   try {
+    const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+
+     if (!token) {
+            return res.status(400).json({ message: "No token provided" });
+        }
+
     await blacklistTokenModel.create({ token });
-    
+
+    res.clearCookie("token");
+
     res.status(200).json({ message: "User logged out successfully" });
+
+   }
+   catch(error){
+         res.status(500).json({ message: error.message });
+
+   }
 }
         
