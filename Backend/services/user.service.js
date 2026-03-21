@@ -1,4 +1,4 @@
-import User from "../models/user.model.js";
+import userModel from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 
 const createuser = async (firstname, lastname, email, password) => {
@@ -6,14 +6,14 @@ const createuser = async (firstname, lastname, email, password) => {
         throw new Error("All fields are required");
     }
 
-    const existing = await User.findOne({ email });
+    const existing = await userModel.findOne({ email });
     if (existing) {
         throw new Error("Email already in use");
     }
 
     const hashed = await bcrypt.hash(password, 10);
 
-    const user = new userModel.create({
+    const user = userModel.create({
         fullname: {
             firstname: firstname,
             lastname: lastname || ""
@@ -21,7 +21,7 @@ const createuser = async (firstname, lastname, email, password) => {
         email: email,
         password: hashed
     });
-    await user.save();
+    // await user.save();
     return user;
 }
 

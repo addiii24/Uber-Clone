@@ -10,6 +10,7 @@ export const registerUser = async (req, res) => {
     }
 
     const { firstname, lastname, fullname, email, password } = req.body;
+
     let fn = firstname, ln = lastname;
     
     if (!fn && fullname && typeof fullname === "object") {
