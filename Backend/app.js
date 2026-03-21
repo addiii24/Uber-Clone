@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import  connectdb  from './db/db.js';
 import { registerUser,login,userprofile,logout } from './controller/user.controller.js';  // ✅ Fixed named import
 import userRoutes from './routes/user.routes.js';
+import captainRoutes from './routes/captain.routes.js';
 import cookieparser from "cookie-parser"
 
 dotenv.config();

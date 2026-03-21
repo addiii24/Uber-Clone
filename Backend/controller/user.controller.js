@@ -13,6 +13,11 @@ export const registerUser = async (req, res) => {
 
     const { firstname, lastname, fullname, email, password } = req.body;
 
+    const isuserAlreadyexist = await userModel.findOne({ email });
+    if(isuserAlreadyexist){
+        return res.status(400).json({ message: "User already exists" });
+    }
+
     let fn = firstname, ln = lastname;
     
     if (!fn && fullname && typeof fullname === "object") {
