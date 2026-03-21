@@ -1,18 +1,19 @@
 import userModel from "../models/user.model.js";
-import jwt from jsonwebtoken;
-import bcrypt from bcrypt;
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import cookieParser from "cookie-parser";
 
 export const authuser = async (req, res, next) => {
     try {
-        const token = req.cookies.token || req.header.authorization.split(' ')[1];
+        const token = req.cookies.token || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
         if (!token) {
-            return res.status(401).json({ message: "Unauthorized" });
+            return res.status(401).json({ message: "Unauthorized Token" });
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await userModel.findById(decoded._id);
+        const user = await userModel.findById(decoded.id);
         if (!user) {
-            return res.status(401).json({ message: "Unauthorized" });
+            return res.status(401).json({ message: "Unauthorized User" });
         }
         req.user = user; 
         next();

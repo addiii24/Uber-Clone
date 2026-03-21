@@ -69,7 +69,10 @@ export const login = async (req, res) => {
     });
 }
 
-export const getuserprofile = async (req, res) => {
-    
+export const userprofile = async (req, res) => {
+    res.status(200).json({ 
+        message: "User profile fetched successfully", 
+        user: req.user
+    });
 }
         
