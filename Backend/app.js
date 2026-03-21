@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import  connectdb  from './db/db.js';
-import { registerUser,login,userprofile } from './controller/user.controller.js';  // ✅ Fixed named import
+import { registerUser,login,userprofile,logout } from './controller/user.controller.js';  // ✅ Fixed named import
 import userRoutes from './routes/user.routes.js';
 import cookieparser from "cookie-parser"
 
@@ -24,5 +24,6 @@ app.get('/', (req, res) => {
 app.post('/api/users/register', registerUser);  
 app.post('/api/users/login', login); 
 app.get('/api/users/profile',userprofile) 
+app.get('/api/users/logout',logout)
 
 export default app;

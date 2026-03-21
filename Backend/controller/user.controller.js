@@ -2,6 +2,8 @@ import { validationResult } from "express-validator";
 import { createuser } from "../services/user.service.js";
 import jwt from "jsonwebtoken"; 
 import userModel from "../models/user.model.js";
+import blacklistTokenModel from "../models/blacklistToken.model.js";
+import cookieParser from "cookie-parser";
 
 export const registerUser = async (req, res) => {
     const errors = validationResult(req);
@@ -29,6 +31,13 @@ export const registerUser = async (req, res) => {
             process.env.JWT_SECRET || 'fallbacksecret',
             { expiresIn: '24h' }
         );
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: "strict",
+            maxAge: 24*60*60*1000
+        });
         
         res.status(201).json({ 
             message: "User registered successfully", 
@@ -58,6 +67,14 @@ export const login = async (req, res) => {
         return res.status(401).json({ message: "Invalid email and password" });
     }
     const token = user.generateAuthToken();
+
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: "strict",
+        maxAge: 24*60*60*1000
+    });
+
     res.status(200).json({ 
         message: "User logged in successfully", 
         user: {
@@ -70,9 +87,19 @@ export const login = async (req, res) => {
 }
 
 export const userprofile = async (req, res) => {
+    
+
     res.status(200).json({ 
         message: "User profile fetched successfully", 
         user: req.user
     });
+}
+
+export const logout = async (req,res) => {
+    res.clearCookie("token");
+    const token = req.token;
+    await blacklistTokenModel.create({ token });
+    
+    res.status(200).json({ message: "User logged out successfully" });
 }
         
