@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import  connectdb  from './db/db.js';
-import { registerUser } from './controller/user.controller.js';  // ✅ Fixed named import
+import { registerUser,login } from './controller/user.controller.js';  // ✅ Fixed named import
 import userRoutes from './routes/user.routes.js';
 
 dotenv.config();
@@ -19,7 +19,7 @@ app.use('/api/users', userRoutes);
 app.get('/', (req, res) => {
     res.send('Hello World!')
 });
-
 app.post('/api/users/register', registerUser);  
+app.post('/api/users/login', login);  
 
 export default app;

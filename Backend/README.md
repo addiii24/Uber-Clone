@@ -73,3 +73,63 @@ Returned when a server issue occurs, such as when trying to register an email th
   "message": "Email already in use"
 }
 ```
+
+---
+
+## Login User Endpoint
+
+Authenticates an existing user and returns an authentication token (JWT).
+
+### Endpoint
+`POST /api/users/login`
+
+### Request Headers
+- `Content-Type: application/json`
+
+### Request Body (Required Data)
+The endpoint expects a JSON body with the following structure:
+```json
+{
+  "email": "adityasharma4131@gmail.com",
+  "password": "securepassword123"
+}
+```
+
+#### Field Restrictions:
+- **`email`**: Required. Must be a valid email format.
+- **`password`**: Required. String, minimum 6 characters.
+
+### Responses
+
+#### 200 OK (Success)
+Returned when the user is successfully authenticated.
+```json
+{
+  "message": "User logged in successfully",
+  "user": {
+      "id": "69be6fd2d4964376ff42d218",
+      "email": "adityasharma4131@gmail.com",
+      "fullname": {
+          "firstname": "Aditya",
+          "lastname": "Sharma"
+      }
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YmU2ZmQyZDQ5NjQzNzZmZjQyZDIxOCIsImlhdCI6MTc3NDA5MjY1OSwiZXhwIjoxNzc0MTc5MDU5fQ.YOTwJYowYBMDRKaPahYiRrHA4jarOxaYFd3wAQWYhBU"
+}
+```
+
+#### 400 Bad Request
+Returned when email or password fields are missing from the request body or have invalid formats.
+```json
+{
+  "message": "All fields are required"
+}
+```
+
+#### 401 Unauthorized
+Returned when the email doesn't correspond to any user, or the password doesn't match.
+```json
+{
+  "message": "Invalid email and password"
+}
+```
