@@ -13,11 +13,11 @@ const createuser = async (firstname, lastname, email, password) => {
 
     const hashed = await bcrypt.hash(password, 10);
 
-    const user = new User({
+    const user = new userModel.create({
         fullname: {
             firstname: firstname,
             lastname: lastname || ""
-        },
+        }, 
         email: email,
         password: hashed
     });

@@ -28,8 +28,7 @@ const userSchema = new mongoose.Schema({
     password : {
         type : String,
         required : true,
-        select : false,
-        minlength : [6, "Password must be at least 6 characters long"]
+        select : false
     },
     soketId : {
         type : String,
@@ -50,5 +49,5 @@ userSchema.static.hashPassword = async function(password) {
     return await bcrypt.hash(password, 10);
 }
 
-const User = mongoose.model("User", userSchema);
-export default User;
+const userModel = mongoose.model("user", userSchema);
+export default userModel;

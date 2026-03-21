@@ -1,6 +1,7 @@
 import { validationResult } from "express-validator";
 import { createuser } from "../services/user.service.js";
-import jwt from "jsonwebtoken"; // Add this import
+import jwt from "jsonwebtoken"; 
+import userModel from "../models/user.model.js";
 
 export const registerUser = async (req, res) => {
     const errors = validationResult(req);
