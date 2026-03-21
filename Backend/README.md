@@ -107,14 +107,14 @@ Returned when the user is successfully authenticated.
 {
   "message": "User logged in successfully",
   "user": {
-      "id": "69be6fd2d4964376ff42d218",
-      "email": "adityasharma4131@gmail.com",
+      "id": "[USER_ID]",
+      "email": "[EMAIL_ADDRESS]",
       "fullname": {
-          "firstname": "Aditya",
-          "lastname": "Sharma"
+          "firstname": "[FIRSTNAME]",
+          "lastname": "[LASTNAME]"
       }
   },
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YmU2ZmQyZDQ5NjQzNzZmZjQyZDIxOCIsImlhdCI6MTc3NDA5MjY1OSwiZXhwIjoxNzc0MTc5MDU5fQ.YOTwJYowYBMDRKaPahYiRrHA4jarOxaYFd3wAQWYhBU"
+  "token": "[JWT_TOKEN]"
 }
 ```
 
