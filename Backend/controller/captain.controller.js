@@ -122,7 +122,11 @@ export const logoutcaptain = async (req,res) => {
             return res.status(400).json({ message: "No token provided" });
         }
 
-    await blacklistTokenModel.create({ token });
+    await blacklistTokenModel.findOneAndUpdate(
+        { token },
+        { token },
+        { upsert: true }
+    );
 
     res.clearCookie("token");
 

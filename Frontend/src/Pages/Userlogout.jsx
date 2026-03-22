@@ -7,19 +7,19 @@ const Userlogout = () => {
     const token = localStorage.getItem('token')
 
     useEffect(() => {
-        axios.post(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/captains/logout`, {}, {
+        axios.post(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/users/logout`, {}, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         }).then((response) => {
             if (response.status === 200) {
                 localStorage.removeItem('token')
-                navigate('/captain-login')
+                navigate('/login')
             }
         }).catch((error) => {
             console.error('Logout error:', error.response?.data || error.message)
             localStorage.removeItem('token')
-            navigate('/captain-login')
+            navigate('/login')
         })
     }, [])
 
