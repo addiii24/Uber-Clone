@@ -18,7 +18,8 @@ export const registerUser = async (req, res) => {
         return res.status(400).json({ message: "User already exists" });
     }
 
-    let fn = firstname, ln = lastname;
+    let fn = firstname, 
+    ln = lastname;
     
     if (!fn && fullname && typeof fullname === "object") {
         fn = fullname.firstname;
@@ -49,7 +50,14 @@ export const registerUser = async (req, res) => {
             user: {
                 id: user._id,
                 email: user.email,
-                fullname: user.fullname
+                fullname: user.fullname,
+                vehicle : {
+                    color: user.vehicle.color,
+                    plate: user.vehicle.plate,
+                    capacity: user.vehicle.capacity,
+                    
+                }
+                
             }, 
             token 
         });

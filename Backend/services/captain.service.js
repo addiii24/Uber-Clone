@@ -13,7 +13,7 @@ const createcaptain = async (firstname, lastname, email, password, color, plate,
 
     const hashed = await bcrypt.hash(password, 10);
 
-    const user = await captainModel.create({
+    const captain = await captainModel.create({
         fullname: {
             firstname: firstname,
             lastname: lastname || ""
@@ -28,7 +28,7 @@ const createcaptain = async (firstname, lastname, email, password, color, plate,
         }
     });
     // await user.save();
-    return user;
+    return captain;
 }
 
 export { createcaptain };

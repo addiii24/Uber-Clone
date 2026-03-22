@@ -213,3 +213,195 @@ Returned if the provided token is invalid or already blacklisted.
   "message": "Unauthorized Token"
 }
 ```
+
+---
+
+# Captain API Documentation
+
+The following endpoints are for Captain (Driver) operations.
+
+---
+
+## Register Captain Endpoint
+
+Registers a new captain in the system and returns an authentication token (JWT).
+
+### Endpoint
+`POST /api/captains/register`
+
+### Request Headers
+- `Content-Type: application/json`
+
+### Request Body (Required Data)
+```json
+{
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "johndoe@example.com",
+  "password": "securepassword123",
+  "vehicle": {
+    "color": "Black",
+    "plate": "ABC-1234",
+    "capacity": 4,
+    "vehicletype": "car"
+  }
+}
+```
+
+#### Field Restrictions:
+- **`fullname.firstname`**: Required. String, minimum 3 characters.
+- **`fullname.lastname`**: Required. String, minimum 3 characters.
+- **`email`**: Required. Must be a valid email format.
+- **`password`**: Required. String, minimum 6 characters.
+- **`vehicle.color`**: Required. String, minimum 3 characters.
+- **`vehicle.plate`**: Required. String, minimum 3 characters.
+- **`vehicle.capacity`**: Required. Number, minimum 1.
+- **`vehicle.vehicletype`**: Required. Must be one of: `"car"`, `"bike"`, or `"auto"`.
+
+### Responses
+
+#### 201 Created (Success)
+Returned when the captain is successfully created.
+```json
+{
+    "message": "Captain registered successfully",
+    "user": {
+        "id": "[CAPTAIN_ID]",
+        "email": "[EMAIL_ADDRESS]",
+        "fullname": {
+            "firstname": "[FIRST_NAME]",
+            "lastname": "[LAST_NAME]"
+        }
+    },
+    "token": "[JWT_TOKEN]"
+}
+```
+
+#### 400 Bad Request
+Returned for validation errors or if the captain's email already exists.
+```json
+{
+  "message": "Captain already exists"
+}
+```
+
+---
+
+## Login Captain Endpoint
+
+Authenticates an existing captain and returns an authentication token (JWT).
+
+### Endpoint
+`POST /api/captains/login`
+
+### Request Headers
+- `Content-Type: application/json`
+
+### Request Body (Required Data)
+```json
+{
+  "email": "johndoe@example.com",
+  "password": "securepassword123"
+}
+```
+
+### Responses
+
+#### 200 OK (Success)
+Returned when the captain is successfully authenticated.
+```json
+{
+  "message": "User logged in successfully",
+  "user": {
+      "id": "[CAPTAIN_ID]",
+      "email": "[EMAIL_ADDRESS]",
+      "fullname": {
+          "firstname": "[FIRSTNAME]",
+          "lastname": "[LASTNAME]"
+      }
+  },
+  "token": "[JWT_TOKEN]"
+}
+```
+
+#### 400 Bad Request
+Returned when fields are missing or invalid.
+```json
+{
+  "message": "All fields are required"
+}
+```
+
+#### 401 Unauthorized
+Returned for invalid credentials.
+```json
+{
+  "message": "Invalid email and password"
+}
+```
+
+---
+
+## Get Captain Profile Endpoint
+
+Retrieves the authenticated captain's profile.
+
+### Endpoint
+`GET /api/captains/profile`
+
+### Request Headers / Cookies
+- Requires a valid JWT token passed either in the `Authorization` header (`Bearer [JWT_TOKEN]`) or in the `token` cookie.
+
+### Responses
+
+#### 200 OK (Success)
+```json
+{
+  "message": "User profile fetched successfully",
+  "user": { ...captain profile data... }
+}
+```
+
+#### 401 Unauthorized
+```json
+{
+  "message": "Unauthorized Token" 
+}
+```
+
+---
+
+## Logout Captain Endpoint
+
+Logs out the captain by blacklisting their token and clearing the cookie.
+
+### Endpoint
+`POST /api/captains/logout`
+
+### Request Headers / Cookies
+- Requires a valid JWT token passed either in the `Authorization` header (`Bearer [JWT_TOKEN]`) or in the `token` cookie.
+
+### Responses
+
+#### 200 OK (Success)
+```json
+{
+  "message": "Captain logged out successfully"
+}
+```
+
+#### 400 Bad Request
+```json
+{
+  "message": "No token provided"
+}
+```
+
+#### 401 Unauthorized
+```json
+{
+  "message": "Unauthorized Token"
+}
+```
