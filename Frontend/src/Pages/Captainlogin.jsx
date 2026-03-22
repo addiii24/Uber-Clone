@@ -1,16 +1,44 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useState, useContext } from 'react'
+import axios from 'axios'
+import {CaptainDataContext} from  '../Context/Captaincontext.jsx'
 
 const Captainlogin = () => {
    const [email, setemail] = useState("")
    const [password, setpassword] = useState("")
-   const [captaindata, setcaptaindata] = useState({})
 
-   const submithandler = (e) => {
+   const {captain ,setCaptain} = useContext(CaptainDataContext)
+   const navigate = useNavigate();
+   
+
+   const submithandler = async (e) => {
     e.preventDefault()
-    setcaptaindata({email : email ,password : password})
 
+    const captainData = {
+      email: email,
+      password : password
+    }
+
+    console.log(captainData)
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, captainData)
+      
+console.log(response)
+
+      if (response.status === 200) {
+        const data = response.data
+        setCaptain(data.captain)
+        localStorage.setItem('captain-token', data.token)
+        setemail('')
+        setpassword('')
+        navigate('/captain-home')
+      }
+    } catch (error) {
+      console.error('Login error:', JSON.stringify(error.response?.data, null, 2) || error.message)
+    }
+ 
     setemail('')
     setpassword('')
    }
@@ -25,7 +53,7 @@ const Captainlogin = () => {
           <h3 className='text-lg font-medium mb-2'>What's your email?</h3>
           <input 
             required 
-            value={email}
+            value={email} 
             onChange={(e)=>setemail(e.target.value)}
             className='bg-[#eeeeee] mb-7 rounded-xl px-4 py-2 border w-full text-lg placeholder:text-base outline-none focus:ring-2 focus:ring-black'
             type="email" 

@@ -50,14 +50,7 @@ export const registerUser = async (req, res) => {
             user: {
                 id: user._id,
                 email: user.email,
-                fullname: user.fullname,
-                vehicle : {
-                    color: user.vehicle.color,
-                    plate: user.vehicle.plate,
-                    capacity: user.vehicle.capacity,
-                    
-                }
-                
+                fullname: user.fullname
             }, 
             token 
         });
@@ -101,7 +94,6 @@ export const login = async (req, res) => {
 
 export const userprofile = async (req, res) => {
     
-
     res.status(200).json({ 
         message: "User profile fetched successfully", 
         user: req.user
@@ -116,7 +108,11 @@ export const logout = async (req,res) => {
             return res.status(400).json({ message: "No token provided" });
         }
 
-    await blacklistTokenModel.create({ token });
+    await blacklistTokenModel.findOneAndUpdate(
+        { token },
+        { token },
+        { upsert: true }
+    );
 
     res.clearCookie("token");
 
