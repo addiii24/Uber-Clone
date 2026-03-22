@@ -18,7 +18,7 @@ const Usersignup = () => {
       email : email,
       password : password
     })
-    console.log(userData)
+    
     setemail('')
     setFirstName('')
     setLastName('')

@@ -10,7 +10,7 @@ const Captainlogin = () => {
    const submithandler = (e) => {
     e.preventDefault()
     setcaptaindata({email : email ,password : password})
-    console.log(captaindata)
+
     setemail('')
     setpassword('')
    }

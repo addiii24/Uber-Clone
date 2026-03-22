@@ -11,7 +11,6 @@ const Userlogin = () => {
    const submithandler = (e) => {
     e.preventDefault()
     setuserdata({email : email ,password : password})
-     console.log(userdata)
     setemail('')
     setpassword('')
    

@@ -30,7 +30,7 @@ const Captainsignup = () => {
          vehicletype: vehicleType
        }
      })
-     console.log(captainData)
+     
      setemail('')
      setFirstName('')
      setLastName('')
