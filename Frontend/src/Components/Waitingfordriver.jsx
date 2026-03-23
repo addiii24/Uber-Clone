@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const Waitingfordriver = ({ ride, pickup, dropoff, onCancel }) => {
   const [message, setMessage] = useState('')
+  const navigate = useNavigate()
 
   // Simulated captain data
   const captain = {
@@ -23,6 +25,12 @@ const Waitingfordriver = ({ ride, pickup, dropoff, onCancel }) => {
       setMessage('')
       alert('Message sent to captain!')
     }
+  }
+
+  const handleStartRide = () => {
+    navigate('/riding', {
+      state: { ride, pickup, dropoff, captain }
+    })
   }
 
   return (
@@ -108,7 +116,7 @@ const Waitingfordriver = ({ ride, pickup, dropoff, onCancel }) => {
       </div>
 
       {/* ===== Journey Details ===== */}
-      <div className="bg-gray-50 rounded-2xl p-4 mb-5">
+      <div className="bg-gray-50 rounded-2xl p-4 mb-4">
         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Journey Details</h3>
 
         {/* Route */}
@@ -150,10 +158,16 @@ const Waitingfordriver = ({ ride, pickup, dropoff, onCancel }) => {
         </div>
       </div>
 
-      {/* ===== Cancel Ride ===== */}
+      {/* ===== Start Ride / Cancel ===== */}
+      <button
+        onClick={handleStartRide}
+        className="w-full py-3.5 bg-black text-white font-bold text-base rounded-2xl hover:bg-gray-900 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-black/20 mb-3"
+      >
+        Start Ride
+      </button>
       <button
         onClick={onCancel}
-        className="w-full py-3.5 bg-red-50 text-red-600 font-semibold text-sm rounded-2xl hover:bg-red-100 active:scale-[0.98] transition-all cursor-pointer border border-red-100"
+        className="w-full py-3 text-red-500 font-semibold text-sm rounded-2xl hover:bg-red-50 active:scale-[0.98] transition-all cursor-pointer"
       >
         Cancel Ride
       </button>
