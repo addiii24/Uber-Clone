@@ -1,7 +1,7 @@
 import {useEffect, useState, useContext} from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { CaptainDataContext } from '../Context/Captaincontext.jsx'
+import {CaptainDataContext} from '../../Context/Captaincontext.jsx'
 
 
 const Captainprotectedwrapper = ({ children }) => {

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { useContext } from 'react'
-import {UserDataContext} from '../Context/Usercontext.jsx'
+import {UserDataContext} from '../../Context/Usercontext.jsx'
 
 const Usersignup = () => {
    const [email, setemail] = useState("")

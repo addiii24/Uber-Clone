@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import VehiclePanel from '../Components/VehiclePanel'
-import ConfirmRide from '../Components/Confrimride'
-import Lookingforvehicle from '../Components/Lookingforvehicle'
-import Waitingfordriver from '../Components/Waitingfordriver'
+import VehiclePanel from '../../Components/VehiclePanel'
+import ConfirmRide from '../../Components/Confrimride'
+import Lookingforvehicle from '../../Components/Lookingforvehicle'
+import Waitingfordriver from '../../Components/Waitingfordriver'
 
 const Home = () => {
   const [pickup, setPickup] = useState('')
@@ -15,7 +15,7 @@ const Home = () => {
   const [showConfirm, setShowConfirm] = useState(false)
   const [showLooking, setShowLooking] = useState(false)
   const [showWaiting, setShowWaiting] = useState(false)
-  
+
   const navigate = useNavigate()
   const panelRef = useRef(null)
 
@@ -54,7 +54,7 @@ const Home = () => {
     },
   ]
 
-  
+
   // Saved locations
   const savedLocations = [
     {
@@ -152,16 +152,10 @@ const Home = () => {
           alt="Map"
           className="w-full h-full object-cover"
         />
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/70 to-transparent" />
-      </div>
 
-      {/* ===== UBER LOGO ===== */}
-      <div className="relative z-10 pt-6 pl-6">
-        <img
-          className="w-14 drop-shadow-md"
-          src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png"
-          alt="Uber"
-        />
+        
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/70 to-transparent" />
+
       </div>
 
       {/* ===== USER LOCATION MARKER ===== */}
