@@ -67,8 +67,8 @@ const Captainhome = () => {
     }
   }, [confirmRidePopupPanel])
 
-  return (
-    <div className="h-screen w-full max-w-md mx-auto relative overflow-hidden bg-gray-100 font-['Inter',sans-serif] flex flex-col">
+   return (
+   <div className="h-screen w-full max-w-md mx-auto relative overflow-hidden bg-gray-100 font-['Inter',sans-serif] flex flex-col">
 
       {/* ===== MAP AREA ===== */}
       <div className="relative flex-1 min-h-0">

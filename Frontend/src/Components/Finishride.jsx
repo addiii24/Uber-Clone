@@ -1,32 +1,32 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 
-const Confirmridepopup = ({ onAccept, onDecline, setConfirmRidePopupPanel, setridePopupPanel }) => {
+const Finishride = ({ setFinishRidePanel }) => {
 
-    const navigate = useNavigate()
-    const [otp, setOtp] = useState('')
+      const navigate = useNavigate()
 
-    // Simulated ride request data
-    const ride = {
-        passengerName: 'Aditya Sharma',
-        passengerPhoto: 'https://randomuser.me/api/portraits/women/44.jpg',
-        pickup: 'Connaught Place, New Delhi',
-        dropoff: 'IGI Airport T3, New Delhi',
-        distance: '14.2 km',
-        duration: '28 min',
-        fare: 193,
-    }
 
-    return (
-        <div className="animate-[fadeIn_0.3s_ease] px-1 h-[95vh] flex flex-col justify-between">
+     
+          // Simulated ride request data
+          const ride = {
+              passengerName: 'Aditya Sharma',
+              passengerPhoto: 'https://randomuser.me/api/portraits/women/44.jpg',
+              pickup: 'Connaught Place, New Delhi',
+              dropoff: 'IGI Airport T3, New Delhi',
+              distance: '14.2 km',
+              duration: '28 min',
+              fare: 193,
+          }
+      
+
+  return (
+           <div className="animate-[fadeIn_0.3s_ease] px-1 h-[95vh] flex flex-col justify-between">
 
             <div>
                 {/* ===== Header ===== */}
-                <div className="text-center mb-4 cursor-pointer" onClick={() => setConfirmRidePopupPanel(false)}>
+                <div className="text-center mb-4 cursor-pointer" onClick={() => setFinishRidePanel(p => !p)}>
                     <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3" />
-                    <h2 className="text-lg font-bold text-gray-900">New Ride Request!</h2>
-                    <p className="text-xs text-gray-400 mt-0.5">Respond before it expires</p>
+                    <h2 className="text-lg font-bold text-gray-900">Finish This Ride</h2>
                 </div>
 
                 {/* ===== Passenger info ===== */}
@@ -92,51 +92,23 @@ const Confirmridepopup = ({ onAccept, onDecline, setConfirmRidePopupPanel, setri
                 </div>
             </div>
 
-            {/* ===== OTP & Action buttons ===== */}
+            {/* ===== Action buttons ===== */}
             <div className="pb-8">
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    navigate('/captain-riding')
-                    setConfirmRidePopupPanel(false)
-                }}>
-                    <input 
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                        type="text" 
-                        placeholder="Enter OTP" 
-                        className="bg-gray-100 px-6 py-4 font-mono text-lg rounded-2xl w-full mt-2 mb-5 border border-gray-200 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-all text-center tracking-[0.5em] shadow-inner"
-                        maxLength={4}
-                        required
-                    />
-                    
-                    <div className="flex gap-3">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setConfirmRidePopupPanel(false)
-                                setridePopupPanel(true)
-                            }}
-                            className="flex-1 py-3.5 bg-gray-100 text-gray-700 font-bold text-sm rounded-2xl hover:bg-gray-200 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-red-500">
-                                <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-                            </svg>
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            className="flex-[2] py-3.5 bg-green-600 text-white font-bold text-sm rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/25 flex items-center justify-center gap-2"
+                <div className="flex gap-3">
+                    <button
+                        type="button"
+                        onClick={() => navigate('/captain-home')}
+                            className="flex-1 py-3.5 bg-green-600 text-white font-bold text-sm rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/25 flex items-center justify-center gap-2"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                                 <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
                             </svg>
-                            Confirm OTP
+                            Finish Ride 
                         </button>
                     </div>
-                </form>
             </div>
         </div>
-    )
+  )
 }
 
-export default Confirmridepopup
+export default Finishride
