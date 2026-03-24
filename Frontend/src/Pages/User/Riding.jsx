@@ -21,6 +21,7 @@ const Riding = () => {
   // Vehicle animation position
   const [position, setPosition] = useState(0)
   const [eta, setEta] = useState(12)
+  const [panelMinimized, setPanelMinimized] = useState(false)
 
   // Animate vehicle moving along the route
   useEffect(() => {
@@ -125,9 +126,9 @@ const Riding = () => {
       </div>
 
       {/* ===== BOTTOM PANEL ===== */}
-      <div className="bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] px-5 pt-4 pb-6 relative -mt-6 z-10">
+      <div className={`bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] px-5 pt-4 pb-6 relative -mt-6 z-10 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${panelMinimized ? 'translate-y-[65%]' : ''}`}>
         {/* Drag handle */}
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-4 cursor-pointer py-2 -my-2" onClick={() => setPanelMinimized(!panelMinimized)}>
           <div className="w-10 h-1 bg-gray-300 rounded-full" />
         </div>
 

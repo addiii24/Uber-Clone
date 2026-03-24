@@ -8,7 +8,7 @@ import React from 'react'
     vehicle: { name: 'Maruti Swift Dzire', plate: 'DL 4C AB 1234', color: 'White' },
   }
 
-const Captaindetails = () => {
+const Captaindetails = ({ setRidePopupPanel }) => {
   return (
     <div> 
         {/* Captain info row */}
@@ -74,8 +74,22 @@ const Captaindetails = () => {
             <h2 className="text-lg font-bold text-gray-900">₹3k</h2>
             <p className="text-[11px] text-gray-600 font-medium">Total Earnings</p>
           </div>
-        </div></div>
+        </div>
+
+        {/* View Ride Requests button */}
+        {setRidePopupPanel && (
+          <button
+            onClick={() => setRidePopupPanel(true)}
+            className="w-full py-3 bg-yellow-400 text-gray-900 font-bold text-sm rounded-xl hover:bg-yellow-500 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4.5 h-4.5">
+              <path fillRule="evenodd" d="M10 2a.75.75 0 0 1 .75.75v7.5a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 10 2ZM5.404 4.343a.75.75 0 0 1 0 1.06 6.5 6.5 0 1 0 9.192 0 .75.75 0 1 1 1.06-1.06 8 8 0 1 1-11.313 0 .75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
+            </svg>
+            View Ride Requests
+          </button>
+        )}
+    </div>
   )
 }
 
-export default Captaindetails
+export default Captaindetails

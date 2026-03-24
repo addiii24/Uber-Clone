@@ -1,10 +1,71 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Captaindetails from '../../Components/Captaindetails'
+import Ridepopup from '../../Components/Ridepopup'
+import Confirmridepopup from '../../Components/Confirmridepopup'
+import { gsap } from 'gsap'
+import { useGSAP } from '@gsap/react'
 
 const Captainhome = () => {
   const navigate = useNavigate()
   // const [isOnline, setIsOnline] = useState(false)
+  const [captainPanel, setCaptainPanel] = useState(true)
+  const [ridePopupPanel, setRidePopupPanel] = useState(true)
+  const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false)
+  const ridePopupPanelRef = useRef(null)
+  const captainPanelRef = useRef(null)
+  const confirmRidePopupPanelRef = useRef(null)
+
+  // Animate RidePopup panel
+  useGSAP(() => {
+    if (ridePopupPanel) {
+      gsap.to(ridePopupPanelRef.current, {
+        transform: 'translateY(0)',
+        duration: 0.5,
+        ease: 'power2.out',
+      })
+    } else {
+      gsap.to(ridePopupPanelRef.current, {
+        transform: 'translateY(100%)',
+        duration: 0.5,
+        ease: 'power2.in',
+      })
+    }
+  }, [ridePopupPanel])
+
+  // Animate CaptainDetails panel
+  useGSAP(() => {
+    if (captainPanel) {
+      gsap.to(captainPanelRef.current, {
+        transform: 'translateY(0)',
+        duration: 0.5,
+        ease: 'power2.out',
+      })
+    } else {
+      gsap.to(captainPanelRef.current, {
+        transform: 'translateY(100%)',
+        duration: 0.5,
+        ease: 'power2.in',
+      })
+    }
+  }, [captainPanel])
+
+  // Animate Confirm Ride Popup panel
+  useGSAP(() => {
+    if (confirmRidePopupPanel) {
+      gsap.to(confirmRidePopupPanelRef.current, {
+        transform: 'translateY(0)',
+        duration: 0.5,
+        ease: 'power2.out',
+      })
+    } else {
+      gsap.to(confirmRidePopupPanelRef.current, {
+        transform: 'translateY(100%)',
+        duration: 0.5,
+        ease: 'power2.in',
+      })
+    }
+  }, [confirmRidePopupPanel])
 
   return (
     <div className="h-screen w-full max-w-md mx-auto relative overflow-hidden bg-gray-100 font-['Inter',sans-serif] flex flex-col">
@@ -18,7 +79,7 @@ const Captainhome = () => {
         />
         <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white/70 to-transparent" />
 
-        {/* ===== TOP BAR: Logo + Toggle + Logout ===== */}
+        {/* ===== TOP BAR ===== */}
         <div className="absolute top-5 left-5 right-5 z-20 flex items-center justify-between">
           {/* Uber logo - top left */}
           <img
@@ -84,17 +145,65 @@ const Captainhome = () => {
         </div>
       </div>
 
-      {/* ===== BOTTOM PANEL ===== */}
-      <div className="bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] px-5 pt-4 pb-6 relative -mt-6 z-20">
-        {/* Drag handle */}
-        <div className="flex justify-center mb-4">
-          <div className="w-10 h-1 bg-gray-300 rounded-full" />
+      {/* ===== CAPTAIN DETAILS BOTTOM PANEL ===== */}
+      <div
+        ref={captainPanelRef}
+        className="fixed bottom-0 left-0 right-0 z-20 max-w-md mx-auto"
+      >
+        <div className="bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] px-5 pt-4 pb-5">
+          {/* Drag handle - toggles captain details */}
+          <div className="flex justify-center mb-3 cursor-pointer py-2 -my-2" onClick={() => setCaptainPanel(!captainPanel)}>
+            <div className="w-10 h-1 bg-gray-300 rounded-full" />
+          </div>
+          <Captaindetails setRidePopupPanel={setRidePopupPanel} />
         </div>
-        {/* Captain Details */}
-        <Captaindetails />
+      </div>
 
+      {/* ===== PULL-UP TAB (visible when both panels are hidden) ===== */}
+      {!captainPanel && !ridePopupPanel && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-20 max-w-md mx-auto animate-[fadeIn_0.3s_ease]"
+        >
+          <div
+            className="bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.1)] px-5 py-3 flex items-center justify-between cursor-pointer"
+            onClick={() => setCaptainPanel(true)}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-sm font-semibold text-gray-900">You're online</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-gray-400">
+              <path fillRule="evenodd" d="M9.47 6.47a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 1 1-1.06 1.06L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25Z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      )}
+
+      {/* ===== RIDE POPUP OVERLAY (slides up from bottom) ===== */}
+      <div
+        ref={ridePopupPanelRef}
+        className="fixed bottom-0 left-0 right-0 z-30 max-w-md mx-auto translate-y-full"
+      >
+        <div className="bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.15)] px-5 pt-4 pb-6">
+          {/* Drag handle */}
+          <div className="flex justify-center mb-3 cursor-pointer py-2 -my-2" onClick={() => setRidePopupPanel(false)}>
+            <div className="w-10 h-1 bg-gray-300 rounded-full" />
+          </div>
+          <Ridepopup setridePopupPanel={setRidePopupPanel} setConfirmRidePopupPanel={setConfirmRidePopupPanel} />
+        </div>
+      </div>
+
+      {/* Confirm Ride PopUp Panel */}
+      <div
+        ref={confirmRidePopupPanelRef}
+        className="fixed bottom-0 left-0 right-0 z-40 max-w-md mx-auto translate-y-full"
+      >
+        <div className="bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.15)] px-4 pt-4 pb-2">
+          <Confirmridepopup setConfirmRidePopupPanel={setConfirmRidePopupPanel} setRidePopupPanel={setRidePopupPanel}/>
+        </div>
       </div>
     </div>
+
   )
 }
 
