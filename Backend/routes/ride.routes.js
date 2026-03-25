@@ -6,9 +6,9 @@ import {createRide} from "../controller/ride.controller.js";
 const router = express.Router();
 
 router.post("/create-ride",authuser,
-    body("userid").isString().isLength({min : 24, max : 24}).notEmpty().withMessage("Invalid userid"),
     body("pickup").isString().isLength({min : 3}).notEmpty().withMessage("Pickup is required"),
-    body("dropoff").isString().isLength({min : 3}).notEmpty().withMessage("Dropoff is required"),
+    body("destination").isString().isLength({min : 3}).notEmpty().withMessage("Destination is required"),
+    body("vehicleType").isString().isIn(['auto', 'car', 'moto']).notEmpty().withMessage("Vehicle type is required"),
     createRide);
 
 export default router;

@@ -4,7 +4,7 @@ dotenv.config();
 
 export const getAddressCoordinates = async (address) => {
     const api = process.env.GOOGLE_MAP_API
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${api}`
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${api}`
     try {
         const response = await axios.get(url);
         if(response.data.status == 'OK'){
@@ -15,7 +15,7 @@ export const getAddressCoordinates = async (address) => {
             };
         }
         else{
-            throw new Error("Address not found")
+            throw new Error(response.data.error_message || "Address not found")
         }
     } catch (error) {
         console.error(error);
@@ -25,19 +25,20 @@ export const getAddressCoordinates = async (address) => {
 
 export const getDistanceAndTime = async (origin, destination) => {
     const api = process.env.GOOGLE_MAP_API
-    const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=${api}`
+    const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&key=${api}`
     try {
         const response = await axios.get(url);
-        if(response.data.status == 'OK'){
-            const distance = response.data.rows[0].elements[0].distance.text;
-            const time = response.data.rows[0].elements[0].duration.text;
+        if(response.data.status === 'OK'){
+            if (response.data.rows[0].elements[0].status === 'ZERO_RESULTS') {
+                throw new Error("No routes found between these locations");
+            }
             return {
-                distance,
-                time
+                distance: response.data.rows[0].elements[0].distance,
+                duration: response.data.rows[0].elements[0].duration
             };
         }
         else{
-            throw new Error("Distance and time not found")
+            throw new Error(response.data.error_message || `Distance and time not found (Status: ${response.data.status})`)
         }
     } catch (error) {
         console.error(error);
@@ -47,7 +48,7 @@ export const getDistanceAndTime = async (origin, destination) => {
 
 export const getAutosuggetions = async (input) => {
     const api = process.env.GOOGLE_MAP_API
-    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${api}`
+    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${api}`
     try {
         const response = await axios.get(url);
         if(response.data.status == 'OK'){
@@ -55,7 +56,7 @@ export const getAutosuggetions = async (input) => {
             return autosuggetions;
         }
         else{
-            throw new Error("Autosuggetions not found")
+            throw new Error(response.data.error_message || "Autosuggetions not found")
         }
     } catch (error) {
         console.error(error);
