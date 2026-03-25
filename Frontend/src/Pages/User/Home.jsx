@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import VehiclePanel from '../../Components/VehiclePanel'
 import ConfirmRide from '../../Components/Confrimride'
 import Lookingforvehicle from '../../Components/Lookingforvehicle'
@@ -10,11 +11,17 @@ const Home = () => {
   const [dropoff, setDropoff] = useState('')
   const [panelOpen, setPanelOpen] = useState(false)
   const [activeField, setActiveField] = useState(null)
+  const [pickupSuggestions, setPickupSuggestions] = useState([])
+  const [destinationSuggestions, setDestinationSuggestions] = useState([])
+  const [homeAddress, setHomeAddress] = useState(() => localStorage.getItem('homeAddress') || '')
+  const [workAddress, setWorkAddress] = useState(() => localStorage.getItem('workAddress') || '')
   const [showRides, setShowRides] = useState(false)
   const [selectedRide, setSelectedRide] = useState(null)
   const [showConfirm, setShowConfirm] = useState(false)
   const [showLooking, setShowLooking] = useState(false)
   const [showWaiting, setShowWaiting] = useState(false)
+  const [fare, setFare] = useState({})
+  const [distanceTime, setDistanceTime] = useState(null)
 
   const navigate = useNavigate()
   const panelRef = useRef(null)
@@ -22,7 +29,7 @@ const Home = () => {
   // Ride options data
   const rides = [
     {
-      id: 'ubergo',
+      id: 'car',
       name: 'UberGo',
       image: 'https://swyft.pl/wp-content/uploads/2023/05/how-many-people-can-a-uberx-take.jpg',
       seats: '4',
@@ -58,6 +65,7 @@ const Home = () => {
   // Saved locations
   const savedLocations = [
     {
+      type: 'home',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
           <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.06l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.69Z" />
@@ -65,9 +73,10 @@ const Home = () => {
         </svg>
       ),
       title: 'Home',
-      subtitle: 'Add your home address',
+      subtitle: homeAddress || 'Add your home address',
     },
     {
+      type: 'work',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
           <path fillRule="evenodd" d="M7.5 5.25a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3v.205c.933.085 1.857.197 2.774.334 1.454.218 2.476 1.483 2.476 2.917v3.033c0 1.211-.734 2.352-1.936 2.752A24.726 24.726 0 0 1 12 15.75c-2.73 0-5.357-.442-7.814-1.259-1.202-.4-1.936-1.541-1.936-2.752V8.706c0-1.434 1.022-2.7 2.476-2.917A48.814 48.814 0 0 1 7.5 5.455V5.25Zm7.5 0v.09a49.488 49.488 0 0 0-6 0v-.09a1.5 1.5 0 0 1 1.5-1.5h3a1.5 1.5 0 0 1 1.5 1.5Zm-3 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
@@ -75,15 +84,46 @@ const Home = () => {
         </svg>
       ),
       title: 'Work',
-      subtitle: 'Add your work address',
+      subtitle: workAddress || 'Add your work address',
     },
   ]
 
-  const handleSubmit = (e) => {
+  const handleUpdateAddress = (type) => {
+    const newAddress = window.prompt(`Enter your ${type} address:`);
+    if (newAddress !== null && newAddress.trim() !== '') {
+        if (type === 'home') {
+            setHomeAddress(newAddress);
+            localStorage.setItem('homeAddress', newAddress);
+        } else {
+            setWorkAddress(newAddress);
+            localStorage.setItem('workAddress', newAddress);
+        }
+    }
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (pickup && dropoff) {
       setShowRides(true)
       setPanelOpen(true)
+      try {
+        const fareResponse = await axios.get(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/ride/get-fare`, {
+          params: { pickup, destination: dropoff },
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        })
+        const mapResponse = await axios.get(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/map/get-distance-time`, {
+          params: { origin: pickup, destination: dropoff },
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        })
+        if(fareResponse.data.success) {
+          setFare(fareResponse.data.fare)
+        }
+        if(mapResponse.data.success) {
+          setDistanceTime(mapResponse.data.data)
+        }
+      } catch (err) {
+        console.error("Failed to fetch fares", err)
+      }
     }
   }
 
@@ -92,6 +132,56 @@ const Home = () => {
     setPanelOpen(true)
     setShowRides(false)
     setSelectedRide(null)
+  }
+
+  const handlePickupChange = async (e) => {
+    setPickup(e.target.value)
+    if (e.target.value.trim().length < 3) { setPickupSuggestions([]); return; }
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/map/get-autosuggetions`, {
+        params: { input: e.target.value },
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      })
+      if(response.data.success) {
+        setPickupSuggestions(response.data.data)
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const handleDestinationChange = async (e) => {
+    setDropoff(e.target.value)
+    if (e.target.value.trim().length < 3) { setDestinationSuggestions([]); return; }
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/map/get-autosuggetions`, {
+        params: { input: e.target.value },
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      })
+      if(response.data.success) {
+        setDestinationSuggestions(response.data.data)
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const createride = async () => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/ride/create-ride`, {
+        pickup,
+        destination: dropoff,
+        vehicleType: selectedRide.id
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      })
+      if(response.data.success) {
+        setShowLooking(false)
+        setShowWaiting(true)
+      }   
+    } catch (err) {
+      console.error("Failed to create ride", err)
+    }
   }
 
   const closePanelHandler = () => {
@@ -179,8 +269,13 @@ const Home = () => {
       {/* ===== BOTTOM PANEL ===== */}
       <div
         ref={panelRef}
-        className={`absolute left-0 right-0 z-30 bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${panelOpen ? 'bottom-0 h-[75%]' : 'bottom-0 h-auto'
-          } ${showRides || showConfirm || showLooking || showWaiting ? 'h-[80%]' : ''}`}
+        className={`absolute left-0 right-0 z-30 bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] bottom-0 ${
+          showRides || showConfirm || showLooking || showWaiting 
+            ? 'h-[80%]' 
+            : panelOpen 
+              ? 'h-[95%]' 
+              : 'h-auto'
+        }`}
       >
         {/* Drag handle */}
         <div
@@ -202,6 +297,8 @@ const Home = () => {
           ) : showLooking && selectedRide ? (
             <Lookingforvehicle
               ride={rides.find(r => r.id === selectedRide)}
+              fare={fare}
+              distanceTime={distanceTime}
               pickup={pickup}
               dropoff={dropoff}
               onCancel={handleCancelLooking}
@@ -210,6 +307,8 @@ const Home = () => {
           ) : showConfirm && selectedRide ? (
             <ConfirmRide
               ride={rides.find(r => r.id === selectedRide)}
+              fare={fare}
+              distanceTime={distanceTime}
               pickup={pickup}
               dropoff={dropoff}
               onBack={handleBackFromConfirm}
@@ -218,6 +317,9 @@ const Home = () => {
           ) : showRides ? (
             <VehiclePanel
               rides={rides}
+              fare={fare}
+              createride={createride}
+              distanceTime={distanceTime}
               selectedRide={selectedRide}
               onSelectRide={setSelectedRide}
               onConfirm={handleConfirmRide}
@@ -252,7 +354,7 @@ const Home = () => {
                       type="text"
                       placeholder="Pickup location"
                       value={pickup}
-                      onChange={(e) => setPickup(e.target.value)}
+                      onChange={handlePickupChange}
                       onFocus={() => handleInputFocus('pickup')}
                       className="w-full pl-11 pr-4 py-3.5 bg-gray-100 rounded-xl text-[15px] font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal outline-none focus:ring-2 focus:ring-black/10 transition-all"
                     />
@@ -264,7 +366,7 @@ const Home = () => {
                       type="text"
                       placeholder="Where to?"
                       value={dropoff}
-                      onChange={(e) => setDropoff(e.target.value)}
+                      onChange={handleDestinationChange}
                       onFocus={() => handleInputFocus('dropoff')}
                       className="w-full pl-11 pr-4 py-3.5 bg-gray-100 rounded-xl text-[15px] font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal outline-none focus:ring-2 focus:ring-black/10 transition-all"
                     />
@@ -351,44 +453,59 @@ const Home = () => {
                       Saved Places
                     </h3>
                     {savedLocations.map((loc, i) => (
-                      <button
+                      <div
                         key={i}
-                        className="flex items-center gap-4 w-full py-3.5 border-b border-gray-100 last:border-0 hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors cursor-pointer"
-                        onClick={() => {
-                          if (activeField === 'pickup') setPickup(loc.title)
-                          else setDropoff(loc.title)
-                        }}
+                        className="flex items-center justify-between w-full py-3.5 border-b border-gray-100 last:border-0 hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors cursor-default"
                       >
-                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shrink-0">
-                          {loc.icon}
+                        <div 
+                          className="flex items-center gap-4 flex-1 cursor-pointer"
+                          onClick={() => {
+                            if (loc.subtitle.startsWith('Add your')) {
+                                handleUpdateAddress(loc.type)
+                            } else {
+                                if (activeField === 'pickup') setPickup(loc.subtitle)
+                                else setDropoff(loc.subtitle)
+                            }
+                          }}
+                        >
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shrink-0">
+                            {loc.icon}
+                          </div>
+                          <div className="text-left">
+                            <p className="text-[15px] font-semibold text-gray-900">{loc.title}</p>
+                            <p className="text-xs text-gray-400 mt-0.5">{loc.subtitle}</p>
+                          </div>
                         </div>
-                        <div className="text-left">
-                          <p className="text-[15px] font-semibold text-gray-900">{loc.title}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">{loc.subtitle}</p>
-                        </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-gray-300 ml-auto shrink-0">
-                          <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-                        </svg>
-                      </button>
+                        <button 
+                          onClick={() => handleUpdateAddress(loc.type)}
+                          className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
+                          title="Edit Address"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                            <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
+                          </svg>
+                        </button>
+                      </div>
                     ))}
                   </div>
 
-                  {/* Recent searches */}
+                  {/* Suggestions searches */}
                   <div className="mt-5">
-                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                      Recent
-                    </h3>
-                    {[
-                      { name: 'Connaught Place', address: 'New Delhi, Delhi 110001' },
-                      { name: 'IGI Airport T3', address: 'New Delhi, Delhi 110037' },
-                      { name: 'Cyber Hub', address: 'Gurugram, Haryana 122002' },
-                    ].map((place, i) => (
+                    {(activeField === 'pickup' && pickupSuggestions.length > 0 || activeField === 'dropoff' && destinationSuggestions.length > 0) && (
+                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                        Suggestions
+                      </h3>
+                    )}
+                    {(activeField === 'pickup' ? pickupSuggestions : destinationSuggestions).map((place, i) => (
                       <button
                         key={i}
                         className="flex items-center gap-4 w-full py-3.5 border-b border-gray-100 last:border-0 hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors cursor-pointer"
                         onClick={() => {
-                          if (activeField === 'pickup') setPickup(place.name)
-                          else setDropoff(place.name)
+                          if (activeField === 'pickup') {
+                            setPickup(place)
+                          } else {
+                            setDropoff(place)
+                          }
                         }}
                       >
                         <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 shrink-0">
@@ -396,9 +513,8 @@ const Home = () => {
                             <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z" clipRule="evenodd" />
                           </svg>
                         </div>
-                        <div className="text-left">
-                          <p className="text-[15px] font-semibold text-gray-900">{place.name}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">{place.address}</p>
+                        <div className="text-left flex-1 py-1">
+                          <p className="text-[15px] font-semibold text-gray-900 leading-snug">{place}</p>
                         </div>
                       </button>
                     ))}

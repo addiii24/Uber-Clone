@@ -1,10 +1,11 @@
 import React from 'react'
 
-const ConfirmRide = ({ ride, pickup, dropoff, onBack, onConfirm }) => {
+const ConfirmRide = ({ ride, fare, distanceTime, pickup, dropoff, onBack, onConfirm }) => {
 
-  // Simulate distance & duration based on ride type
-  const distance = ride.id === 'moto' ? '4.2 km' : ride.id === 'auto' ? '4.2 km' : '4.2 km'
-  const duration = ride.id === 'moto' ? '12 min' : ride.id === 'auto' ? '18 min' : '15 min'
+  const distance = distanceTime?.distance?.text || '4.2 km'
+  const duration = distanceTime?.duration?.text || '15 min'
+  const actualPrice = fare[ride.id] || ride.price
+  const originalPrice = fare[ride.id] ? fare[ride.id] + 30 : ride.originalPrice
 
   return (
     <div className="animate-[fadeIn_0.3s_ease]">
@@ -97,33 +98,33 @@ const ConfirmRide = ({ ride, pickup, dropoff, onBack, onConfirm }) => {
         <div className="space-y-2.5">
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-500">Base fare</span>
-            <span className="text-sm font-medium text-gray-700">₹{Math.round(ride.price * 0.4)}</span>
+            <span className="text-sm font-medium text-gray-700">₹{Math.round(actualPrice * 0.4)}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-500">Distance charge</span>
-            <span className="text-sm font-medium text-gray-700">₹{Math.round(ride.price * 0.35)}</span>
+            <span className="text-sm font-medium text-gray-700">₹{Math.round(actualPrice * 0.35)}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-500">Platform fee</span>
-            <span className="text-sm font-medium text-gray-700">₹{Math.round(ride.price * 0.1)}</span>
+            <span className="text-sm font-medium text-gray-700">₹{Math.round(actualPrice * 0.1)}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-500">Taxes</span>
-            <span className="text-sm font-medium text-gray-700">₹{Math.round(ride.price * 0.15)}</span>
+            <span className="text-sm font-medium text-gray-700">₹{Math.round(actualPrice * 0.15)}</span>
           </div>
-          {ride.originalPrice && (
+          {originalPrice && (
             <div className="flex justify-between items-center">
               <span className="text-sm text-green-600 font-medium">Discount</span>
-              <span className="text-sm font-medium text-green-600">-₹{ride.originalPrice - ride.price}</span>
+              <span className="text-sm font-medium text-green-600">-₹{originalPrice - actualPrice}</span>
             </div>
           )}
           <div className="border-t border-gray-200 pt-2.5 mt-1">
             <div className="flex justify-between items-center">
               <span className="text-base font-bold text-gray-900">Total</span>
               <div className="text-right">
-                <span className="text-base font-bold text-gray-900">₹{ride.price}</span>
-                {ride.originalPrice && (
-                  <span className="text-xs text-gray-400 line-through ml-2">₹{ride.originalPrice}</span>
+                <span className="text-base font-bold text-gray-900">₹{actualPrice}</span>
+                {originalPrice && (
+                  <span className="text-xs text-gray-400 line-through ml-2">₹{originalPrice}</span>
                 )}
               </div>
             </div>
@@ -152,7 +153,7 @@ const ConfirmRide = ({ ride, pickup, dropoff, onBack, onConfirm }) => {
         onClick={onConfirm}
         className="w-full py-4 bg-green-600 text-white font-bold text-base rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/25"
       >
-        Confirm {ride.name} · ₹{ride.price}
+        Confirm {ride.name} · ₹{actualPrice}
       </button>
     </div>
   )

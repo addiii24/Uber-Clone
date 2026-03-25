@@ -1,6 +1,6 @@
 import React from 'react'
 
-const VehiclePanel = ({ rides, selectedRide, onSelectRide, onConfirm, onBack, pickup, dropoff }) => {
+const VehiclePanel = ({ rides, fare, distanceTime, selectedRide, onSelectRide, onConfirm, onBack, pickup, dropoff, createride }) => {
   return (
     <div className="animate-[fadeIn_0.3s_ease]">
       {/* Header */}
@@ -38,7 +38,8 @@ const VehiclePanel = ({ rides, selectedRide, onSelectRide, onConfirm, onBack, pi
         {rides.map((ride) => (
           <button
             key={ride.id}
-            onClick={() => onSelectRide(ride.id)}
+            onClick={() => {
+              onSelectRide(ride.id)}}
             className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl transition-all cursor-pointer ${selectedRide === ride.id
                 ? 'bg-gray-900 text-white shadow-lg shadow-gray-900/20'
                 : 'bg-white hover:bg-gray-50 text-gray-900 border border-transparent'
@@ -69,7 +70,7 @@ const VehiclePanel = ({ rides, selectedRide, onSelectRide, onConfirm, onBack, pi
               </div>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className={`text-xs ${selectedRide === ride.id ? 'text-gray-300' : 'text-gray-400'}`}>
-                  {ride.eta}
+                  {distanceTime?.duration ? distanceTime.duration.text : ride.eta}
                 </span>
                 {ride.tag && (
                   <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${selectedRide === ride.id
@@ -80,18 +81,16 @@ const VehiclePanel = ({ rides, selectedRide, onSelectRide, onConfirm, onBack, pi
                   </span>
                 )}
               </div>
-              {ride.description && (
-                <p className={`text-[11px] mt-0.5 ${selectedRide === ride.id ? 'text-gray-400' : 'text-gray-400'
-                  }`}>{ride.description}</p>
-              )}
+              <p className={`text-[11px] mt-0.5 ${selectedRide === ride.id ? 'text-gray-400' : 'text-gray-400'
+                }`}>{distanceTime?.distance ? `${distanceTime.distance.text} away` : ride.description}</p>
             </div>
 
             {/* Price */}
             <div className="text-right shrink-0">
-              <p className="text-[15px] font-bold">₹{ride.price}</p>
+              <p className="text-[15px] font-bold">₹{fare[ride.id] || ride.price}</p>
               {ride.originalPrice && (
                 <p className={`text-xs line-through ${selectedRide === ride.id ? 'text-gray-400' : 'text-gray-400'
-                  }`}>₹{ride.originalPrice}</p>
+                  }`}>₹{(fare[ride.id] && fare[ride.id] + 30) || ride.originalPrice}</p>
               )}
             </div>
           </button>

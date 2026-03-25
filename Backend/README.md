@@ -405,3 +405,247 @@ Logs out the captain by blacklisting their token and clearing the cookie.
   "message": "Unauthorized Token"
 }
 ```
+
+---
+
+# Map API Documentation
+
+The following endpoints handle map-based features like coordinates, distance/time calculation, and location auto-suggestions.
+
+---
+
+## Get Coordinates Endpoint
+
+Fetches the geographical coordinates (latitude and longitude) for a given address.
+
+### Endpoint
+`GET /api/map/get-coordinates`
+
+### Request Headers / Cookies
+- Requires a valid JWT token passed either in the `Authorization` header (`Bearer [JWT_TOKEN]`) or in the `token` cookie.
+
+### Query Parameters
+- **`address`**: Required. String, minimum 3 characters.
+
+### Responses
+
+#### 200 OK (Success)
+```json
+{
+  "success": true,
+  "message": "Coordinates fetched successfully",
+  "data": { ...coordinate data... }
+}
+```
+
+#### 400 Bad Request
+Returned for validation errors (e.g., missing address query).
+```json
+{
+  "errors": [ ...validation errors... ]
+}
+```
+
+#### 404 Not Found
+Returned if coordinates cannot be fetched.
+```json
+{
+  "success": false,
+  "message": "Failed to fetch coordinates",
+  "error": "[ERROR_MESSAGE]"
+}
+```
+
+---
+
+## Get Distance and Time Endpoint
+
+Calculates the distance and estimated travel time between an origin and destination.
+
+### Endpoint
+`GET /api/map/get-distance-time`
+
+### Request Headers / Cookies
+- Requires a valid JWT token.
+
+### Query Parameters
+- **`origin`**: Required. String, minimum 3 characters.
+- **`destination`**: Required. String, minimum 3 characters.
+
+### Responses
+
+#### 200 OK (Success)
+```json
+{
+  "success": true,
+  "message": "Distance and time fetched successfully",
+  "data": { ...distance and time data... }
+}
+```
+
+#### 400 Bad Request
+```json
+{
+  "errors": [ ...validation errors... ]
+}
+```
+
+#### 404 Not Found
+```json
+{
+  "success": false,
+  "message": "Failed to fetch distance and time",
+  "error": "[ERROR_MESSAGE]"
+}
+```
+
+---
+
+## Get Auto-suggestions Endpoint
+
+Provides autocomplete location suggestions based on user input.
+
+### Endpoint
+`GET /api/map/get-autosuggetions`
+
+### Request Headers / Cookies
+- Requires a valid JWT token.
+
+### Query Parameters
+- **`input`**: Required. String, minimum 3 characters.
+
+### Responses
+
+#### 200 OK (Success)
+```json
+{
+  "success": true,
+  "message": "Autosuggetions fetched successfully",
+  "data": [ ...array of suggestions... ]
+}
+```
+
+#### 400 Bad Request
+```json
+{
+  "errors": [ ...validation errors... ]
+}
+```
+
+#### 404 Not Found
+```json
+{
+  "success": false,
+  "message": "Failed to fetch autosuggetions",
+  "error": "[ERROR_MESSAGE]"
+}
+```
+
+---
+
+# Ride API Documentation
+
+The following endpoints handle the creation and fare estimation of rides.
+
+---
+
+## Create Ride Endpoint
+
+Creates a new ride request for a user.
+
+### Endpoint
+`POST /api/ride/create-ride`
+
+### Request Headers / Cookies
+- Requires a valid User JWT token passed either in the `Authorization` header (`Bearer [JWT_TOKEN]`) or in the `token` cookie.
+
+### Request Body (Required Data)
+```json
+{
+  "pickup": "Connaught Place, New Delhi",
+  "destination": "India Gate, New Delhi",
+  "vehicleType": "car"
+}
+```
+
+#### Field Restrictions:
+- **`pickup`**: Required. String, minimum 3 characters.
+- **`destination`**: Required. String, minimum 3 characters.
+- **`vehicleType`**: Required. Must be one of: `"auto"`, `"car"`, or `"moto"`.
+
+### Responses
+
+#### 201 Created (Success)
+Returned when the ride is successfully created.
+```json
+{
+  "success": true,
+  "ride": { ...ride details... }
+}
+```
+
+#### 400 Bad Request
+Returned for validation errors.
+```json
+{
+  "success": false,
+  "errors": [ ...validation errors... ]
+}
+```
+
+#### 500 Internal Server Error
+Returned if ride creation fails.
+```json
+{
+  "success": false,
+  "message": "[ERROR_MESSAGE]"
+}
+```
+
+---
+
+## Get Fare Endpoint
+
+Calculates and returns the estimated fare for different vehicle types between a pickup and destination.
+
+### Endpoint
+`POST /api/ride/get-fare`
+
+*(Note: Ensure you pass these as query parameters even though the method is POST according to the codebase, or pass as query if method is updated).*
+
+### Request Headers / Cookies
+- Requires a valid User JWT token.
+
+### Query Parameters
+- **`pickup`**: Required. String, minimum 3 characters.
+- **`destination`**: Required. String, minimum 3 characters.
+- **`vehicleType`**: Required. Must be one of: `"auto"`, `"car"`, or `"moto"`.
+
+### Responses
+
+#### 200 OK (Success)
+Returned when the fare is successfully calculated.
+```json
+{
+  "success": true,
+  "fare": { ...fare estimation object... }
+}
+```
+
+#### 400 Bad Request
+Returned for validation errors.
+```json
+{
+  "success": false,
+  "errors": [ ...validation errors... ]
+}
+```
+
+#### 500 Internal Server Error
+Returned if fare calculation fails.
+```json
+{
+  "success": false,
+  "message": "[ERROR_MESSAGE]"
+}
+```

@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import crypto from "crypto";
 dotenv.config();
 
-export const getFare = async (pickup, destination) => {
+const getFare = async (pickup, destination) => {
     if(!pickup || !destination){
         throw new Error("Pickup and destination are required");
     }
@@ -47,7 +47,6 @@ const getOtp = (num) => {
     }
     return generateOtp(num);
 }
-
 
 const createride = async ({userid, pickup, destination, vehicleType}) => {
     try {
