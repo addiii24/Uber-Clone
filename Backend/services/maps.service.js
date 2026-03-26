@@ -1,5 +1,7 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
+import {body} from 'express-validator'
+import captainModel from '../models/captain.model.js';
 dotenv.config();
 
 export const getAddressCoordinates = async (address) => {
@@ -60,6 +62,28 @@ export const getAutosuggetions = async (input) => {
         }
     } catch (error) {
         console.error(error);
+        throw error;
+    }
+}
+
+export const getCaptainInTheRadius = async (ltd, lng) => {
+    try {
+        const captains = await captainModel.find({
+            location: {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [lng, ltd] // ✅ correct order
+                    },
+                    $maxDistance: 10000 // 10km
+                }
+            }
+        });
+
+        return captains;
+
+    } catch (error) {
+        console.error("Error finding captains:", error);
         throw error;
     }
 }

@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import VehiclePanel from '../../Components/VehiclePanel'
 import ConfirmRide from '../../Components/Confrimride'
 import Lookingforvehicle from '../../Components/Lookingforvehicle'
 import Waitingfordriver from '../../Components/Waitingfordriver'
+import { SocketContext } from '../../Context/Socketiocontext'
+import { UserDataContext } from '../../Context/Usercontext'
 
 const Home = () => {
   const [pickup, setPickup] = useState('')
@@ -25,6 +27,25 @@ const Home = () => {
 
   const navigate = useNavigate()
   const panelRef = useRef(null)
+
+  const socket = useContext(SocketContext)
+  const {user} = useContext(UserDataContext)
+
+  useEffect(() => {
+      if (!user?._id) return
+      socket.emit("join", { userId: user._id, userType: "user" })
+  }, [user])
+
+  useEffect(() => {
+    socket.on('ride-confirmed', (ride) => {
+      setShowLooking(false)
+      setShowWaiting(true)
+      setSelectedRide(ride)
+    })
+    return () => socket.off('ride-confirmed')
+  }, [socket])
+
+  
 
   // Ride options data
   const rides = [
@@ -60,7 +81,6 @@ const Home = () => {
       description: 'No bargaining, doorstep pickup',
     },
   ]
-
 
   // Saved locations
   const savedLocations = [
@@ -168,19 +188,17 @@ const Home = () => {
 
   const createride = async () => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/ride/create-ride`, {
+      console.log("Creating ride with:", { pickup, destination: dropoff, vehicleType: selectedRide?.id })
+      await axios.post(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/ride/create-ride`, {
         pickup,
         destination: dropoff,
-        vehicleType: selectedRide.id
+        vehicleType: selectedRide?.id
       }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
-      if(response.data.success) {
-        setShowLooking(false)
-        setShowWaiting(true)
-      }   
+      // Stay on showLooking — transition to showWaiting happens via socket 'ride-confirmed'
     } catch (err) {
-      console.error("Failed to create ride", err)
+      console.error("Failed to create ride:", err.response?.data || err.message)
     }
   }
 
@@ -213,6 +231,7 @@ const Home = () => {
   const handleFinalConfirm = () => {
     setShowConfirm(false)
     setShowLooking(true)
+    createride()
   }
 
   const handleCancelLooking = () => {
@@ -289,7 +308,7 @@ const Home = () => {
           {/* ===== WAITING FOR DRIVER VIEW ===== */}
           {showWaiting && selectedRide ? (
             <Waitingfordriver
-              ride={rides.find(r => r.id === selectedRide)}
+              ride={selectedRide}
               pickup={pickup}
               dropoff={dropoff}
               onCancel={handleCancelWaiting}

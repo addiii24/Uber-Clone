@@ -1,17 +1,17 @@
 import React from 'react'
 
-const Ridepopup = ({ onAccept, onDecline, setridePopupPanel, setConfirmRidePopupPanel }) => {
+const Ridepopup = ({ ride, setridePopupPanel, setConfirmRidePopupPanel, confirmRide }) => {
 
   // Simulated ride request data
-  const ride = {
-    passengerName: 'Aditya Sharma',
-    passengerPhoto: 'https://randomuser.me/api/portraits/women/44.jpg',
-    pickup: 'Connaught Place, New Delhi',
-    dropoff: 'IGI Airport T3, New Delhi',
-    distance: '14.2 km',
-    duration: '28 min',
-    fare: 193,
-  }
+  // const ride = {
+  //   passengerName: 'Aditya Sharma',
+  //   passengerPhoto: 'https://randomuser.me/api/portraits/women/44.jpg',
+  //   pickup: 'Connaught Place, New Delhi',
+  //   dropoff: 'IGI Airport T3, New Delhi',
+  //   distance: '14.2 km',
+  //   duration: '28 min',
+  //   fare: 193,
+  // }
 
   return (
     <div className="animate-[fadeIn_0.3s_ease] px-1">
@@ -25,15 +25,15 @@ const Ridepopup = ({ onAccept, onDecline, setridePopupPanel, setConfirmRidePopup
       {/* ===== Passenger info ===== */}
       <div className="flex items-center gap-3 mb-4">
         <img
-          src={ride.passengerPhoto}
-          alt={ride.passengerName}
+          src="https://randomuser.me/api/portraits/women/44.jpg"
+          alt=""
           className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md"
         />
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-bold text-gray-900 truncate">{ride.passengerName}</h3>
+          <h3 className="text-lg font-bold text-gray-900 truncate">{ride?.user?.fullname.firstname + " " + ride?.user?.fullname.lastname}</h3>
         </div>
         <div className="text-right">
-          <p className="text-lg font-bold text-gray-900">₹{ride.fare}</p>
+          <p className="text-lg font-bold text-gray-900">₹{ride?.fare}</p>
           <p className="text-[13px] text-gray-400 font-medium">Cash</p>
         </div>
       </div>
@@ -49,11 +49,11 @@ const Ridepopup = ({ onAccept, onDecline, setridePopupPanel, setConfirmRidePopup
           <div className="flex-1 min-w-0">
             <div className="pb-2.5">
               <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Pickup</p>
-              <p className="text-sm font-medium text-gray-900 truncate mt-0.5">{ride.pickup}</p>
+              <p className="text-sm font-medium text-gray-900 truncate mt-0.5">{ride?.pickup}</p>
             </div>
             <div className="border-t border-gray-200 pt-2.5">
               <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Dropoff</p>
-              <p className="text-sm font-medium text-gray-900 truncate mt-0.5">{ride.dropoff}</p>
+              <p className="text-sm font-medium text-gray-900 truncate mt-0.5">{ride?.destination}</p>
             </div>
           </div>
         </div>
@@ -65,14 +65,14 @@ const Ridepopup = ({ onAccept, onDecline, setridePopupPanel, setConfirmRidePopup
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-gray-500">
             <path fillRule="evenodd" d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clipRule="evenodd" />
           </svg>
-          <span className="text-sm font-medium text-gray-700">{ride.distance}</span>
+          <span className="text-sm font-medium text-gray-700">4.2km</span>
         </div>
         <div className="w-[1px] h-4 bg-gray-300" />
         <div className="flex items-center gap-1.5">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-gray-500">
             <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z" clipRule="evenodd" />
           </svg>
-          <span className="text-sm font-medium text-gray-700">{ride.duration}</span>
+          <span className="text-sm font-medium text-gray-700">20 min</span>
         </div>
         <div className="w-[1px] h-4 bg-gray-300" />
         <div className="flex items-center gap-1.5">
@@ -80,7 +80,7 @@ const Ridepopup = ({ onAccept, onDecline, setridePopupPanel, setConfirmRidePopup
             <path fillRule="evenodd" d="M1 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4Zm12 4a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM4 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm13-1a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" clipRule="evenodd" />
             <path d="M1 14.5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-2Z" />
           </svg>
-          <span className="text-sm font-bold text-gray-900">₹{ride.fare}</span>
+          <span className="text-sm font-bold text-gray-900">₹{ride?.fare}</span>
         </div>
       </div>
 
@@ -99,7 +99,7 @@ const Ridepopup = ({ onAccept, onDecline, setridePopupPanel, setConfirmRidePopup
         </button>
         <button
          onClick={()=>{
-           
+            confirmRide()
             setConfirmRidePopupPanel(true)
           }}
           className="flex-[2] py-3.5 bg-green-600 text-white font-bold text-sm rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/25 flex items-center justify-center gap-2"

@@ -6,17 +6,84 @@ import Ridepopup from '../../Components/Ridepopup'
 import Confirmridepopup from '../../Components/Confirmridepopup'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
+import { SocketContext } from '../../Context/Socketiocontext'
+import { CaptainDataContext } from '../../Context/Captaincontext'
+
+
 
 const Captainhome = () => {
   const navigate = useNavigate()
   // const [isOnline, setIsOnline] = useState(false)
   const [captainPanel, setCaptainPanel] = useState(true)
-  const [ridePopupPanel, setRidePopupPanel] = useState(true)
+  const [ridePopupPanel, setRidePopupPanel] = useState(false)
   const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false)
   const [captainData, setCaptainData] = useState(null)
+  const [ride, setRide] = useState(null)
   const ridePopupPanelRef = useRef(null)
   const captainPanelRef = useRef(null)
   const confirmRidePopupPanelRef = useRef(null)
+
+  const { captain } = useContext(CaptainDataContext)
+  const socket = useContext(SocketContext)   // context value IS the socket, not {socket}
+
+  const confirmRide = async () => {
+
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/ride/confirm`, {
+
+            rideId: ride._id,
+            captainId: captain._id,
+
+
+        }, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('captain-token')}`
+            }
+        })
+
+        setRidePopupPanel(false)
+        setConfirmRidePopupPanel(true)
+
+    }
+
+
+  useEffect(() => {
+    if (!captain?._id) return
+    socket.emit("join", {
+      userId: captain._id,
+      userType: "captain"
+    })
+
+    const updateLocation = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+
+               
+
+                    socket.emit('update-location-captain', {
+                        userId: captain._id,
+                        location: {
+                            ltd: position.coords.latitude,
+                            lng: position.coords.longitude
+                        }
+                    })
+                })
+            }
+        }
+        const locationInterval = setInterval(updateLocation, 10000)
+        updateLocation()
+
+        // return () => clearInterval(locationInterval)
+  }, [captain])
+
+  useEffect(() => {
+    socket.on("new-ride", (data) => {
+      console.log("new-ride", data)
+      setRide(data)
+      setRidePopupPanel(true)
+    })
+
+    return () => socket.off("new-ride")
+  }, [socket])
 
   const fetchCaptain = async () => {
     try {
@@ -175,7 +242,11 @@ const Captainhome = () => {
           <div className="flex justify-center mb-3 cursor-pointer py-2 -my-2" onClick={() => setRidePopupPanel(false)}>
             <div className="w-10 h-1 bg-gray-300 rounded-full" />
           </div>
-          <Ridepopup setridePopupPanel={setRidePopupPanel} setConfirmRidePopupPanel={setConfirmRidePopupPanel} />
+          <Ridepopup
+            ride={ride}
+            confirmRide={confirmRide}
+           setridePopupPanel={setRidePopupPanel} 
+           setConfirmRidePopupPanel={setConfirmRidePopupPanel} />
         </div>
       </div>
 

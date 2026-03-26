@@ -71,5 +71,26 @@ const createride = async ({userid, pickup, destination, vehicleType}) => {
     }
 }
 
+const confirmride = async ({rideId, captainid}) => {
+    try {
+        if(!rideId || !captainid){
+            throw new Error("All fields are required")
+        }
 
-export default { getFare, createride };
+        await Ride.findOneAndUpdate({_id: rideId},{
+             captain: captainid,
+             status: "accepted"
+            });
+
+        const ride = await Ride.findOne({_id: rideId}).populate("user");
+        if(!ride){
+            throw new Error("Ride not found");
+        }
+        
+        return ride;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export default { getFare, createride, confirmride };

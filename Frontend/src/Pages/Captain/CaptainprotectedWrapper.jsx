@@ -13,7 +13,7 @@ const Captainprotectedwrapper = ({ children }) => {
     useEffect(() => {
         if (!token) {
             navigate('/captain-login')
-            return
+            return  
         }
 
         axios.get(`${import.meta.env.VITE_BASE_URL}/captains/profile`, {
@@ -22,8 +22,7 @@ const Captainprotectedwrapper = ({ children }) => {
             }
         }).then((response) => {
             if (response.status === 200) {
-                const data = response.data
-                setCaptain(data.user || data.captain || null)
+                setCaptain(response.data.user || response.data || null)
                 setIsLoading(false)
             }
         }).catch((error) => {

@@ -1,4 +1,4 @@
-import { getAddressCoordinates, getDistanceAndTime, getAutosuggetions } from "../services/maps.service.js";
+import { getAddressCoordinates, getDistanceAndTime, getAutosuggetions, getCaptainInTheRadius } from "../services/maps.service.js";
 import {validationResult} from "express-validator";
 
 export const getcoordinates = async (req, res) => {
@@ -62,6 +62,28 @@ export const getautosuggetions = async (req, res) => {
         res.status(404).json({
             success: false,
             message: "Failed to fetch autosuggetions",
+            error: error.message
+        });
+    }
+}
+
+export const getCaptainNearby = async (req, res) => {
+    try {
+        const { ltd, lng } = req.body;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        const captains = await getCaptainInTheRadius(ltd, lng);
+        res.status(200).json({
+            success: true,
+            message: "Captains fetched successfully",
+            data: captains
+        });
+    } catch (error) {
+        res.status(404).json({
+            success: false,
+            message: "Failed to fetch captains",
             error: error.message
         });
     }

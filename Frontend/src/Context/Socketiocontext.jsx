@@ -5,8 +5,8 @@ export const SocketContext = createContext();
 
 // ✅ IMPORTANT: DO NOT USE /api
 const socket = io("http://localhost:3000", {
-    transports: ["websocket"], // 🔥 force websocket only
-    withCredentials: false,    // 🔥 match backend "*"
+    transports: ["polling", "websocket"], // ✅ allow fallback
+
 });
 
 const SocketProvider = ({ children }) => {
@@ -33,7 +33,7 @@ const SocketProvider = ({ children }) => {
     }, []);
 
     return (
-        <SocketContext.Provider value={{ socket }}>
+        <SocketContext.Provider value={socket}>
             {children}
         </SocketContext.Provider>
     );

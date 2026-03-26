@@ -8,36 +8,6 @@ const Lookingforvehicle = ({ ride, fare, distanceTime, pickup, dropoff, onCancel
   const actualPrice = fare && ride?.id ? fare[ride.id] || ride.price : ride.price
   const originalPrice = fare && ride?.id && fare[ride.id] ? fare[ride.id] + 30 : ride.originalPrice
 
-  // Auto-transition to driver found after 5 seconds
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (onDriverFound) onDriverFound()
-    }, 5000)
-    return () => clearTimeout(timeout)
-  }, [onDriverFound])
-
-  // Animate the loading dots
-  useEffect(() => {
-    const dotInterval = setInterval(() => {
-      setDots(prev => prev.length >= 3 ? '' : prev + '.')
-    }, 500)
-    return () => clearInterval(dotInterval)
-  }, [])
-
-  // Timer counting up
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSearchTime(prev => prev + 1)
-    }, 1000)
-    return () => clearInterval(timer)
-  }, [])
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
-
   return (
     <div className="animate-[fadeIn_0.3s_ease]">
       {/* Vehicle image */}
@@ -57,19 +27,6 @@ const Lookingforvehicle = ({ ride, fare, distanceTime, pickup, dropoff, onCancel
         <p className="text-sm text-gray-400 mt-1">
           Searching nearby {ride.name} drivers
         </p>
-      </div>
-
-      {/* Animated searching indicator */}
-      <div className="flex justify-center mb-6">
-        <div className="relative w-20 h-20">
-          {/* Outer ring - spinning */}
-          <div className="absolute inset-0 rounded-full border-[3px] border-gray-200" />
-          <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-black animate-spin" />
-          {/* Inner content */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-sm font-bold text-gray-900">{formatTime(searchTime)}</span>
-          </div>
-        </div>
       </div>
 
       {/* Ride details card */}

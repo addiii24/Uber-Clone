@@ -1,7 +1,8 @@
 import express from "express";
 import {body, query} from "express-validator";
 import {authuser} from "../middleware/auth.middleware.js";
-import {createRide, getFare} from "../controller/ride.controller.js";
+import {authcaptain} from "../middleware/captainauth.middleware.js"
+import {createRide, getFare, confirmRide} from "../controller/ride.controller.js";
 
 const router = express.Router();
 
@@ -15,5 +16,10 @@ router.get("/get-fare",authuser,
     query("pickup").isString().isLength({min : 3}).notEmpty().withMessage("Pickup is required"),
     query("destination").isString().isLength({min : 3}).notEmpty().withMessage("Destination is required"),
     getFare);
+
+router.post("/confirm", authcaptain,
+    body("rideId").isString().notEmpty().withMessage("Ride ID is required"),
+    confirmRide
+)
 
 export default router;

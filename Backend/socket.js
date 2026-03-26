@@ -20,6 +20,13 @@ export const initializeSocket = (httpServer) => {
 
     socket.on('join', async (data) => {
       const { userId, userType } = data;
+      console.log(`join event received: userId=${userId}, userType=${userType}`)
+
+      if (!userId) {
+        console.warn('join event received with no userId — skipping DB update')
+        return
+      }
+
       if (userType === 'user') {
         await userModel.findByIdAndUpdate(userId, { $set: { socketId: socket.id } });
         console.log(`user ${userId} joined with socket id ${socket.id}`)
