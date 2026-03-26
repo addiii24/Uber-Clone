@@ -310,6 +310,7 @@ const Home = () => {
           {showWaiting && selectedRide ? (
             <Waitingfordriver
               ride={rides.find(r => r.id === selectedRide)}
+              distanceTime={distanceTime}
               confirmedRide={confirmedRide}
               pickup={pickup}
               dropoff={dropoff}

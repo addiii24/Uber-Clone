@@ -19,6 +19,7 @@ const Captainhome = () => {
   const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false)
   const [captainData, setCaptainData] = useState(null)
   const [ride, setRide] = useState(null)
+  const [distanceTime, setDistanceTime] = useState(null)
   const ridePopupPanelRef = useRef(null)
   const captainPanelRef = useRef(null)
   const confirmRidePopupPanelRef = useRef(null)
@@ -73,10 +74,22 @@ const Captainhome = () => {
   }, [captain])
 
   useEffect(() => {
-    socket.on("new-ride", (data) => {
+    socket.on("new-ride", async (data) => {
       console.log("new-ride", data)
       setRide(data)
       setRidePopupPanel(true)
+      // Fetch real distance & duration for this ride
+     try {
+        const mapResponse = await axios.get(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/map/get-distance-time`, {
+          params: { origin: data.pickup, destination: data.destination },
+          headers: { Authorization: `Bearer ${localStorage.getItem('captain-token')}` }
+        })
+        if (mapResponse.data.success) {
+          setDistanceTime(mapResponse.data.data)
+        }
+      } catch (err) {
+        console.error("Failed to fetch distance/time:", err.response?.data || err.message)
+      }
     })
 
     return () => socket.off("new-ride")
@@ -241,6 +254,7 @@ const Captainhome = () => {
           </div>
           <Ridepopup
             ride={ride}
+            distanceTime={distanceTime}
             confirmRide={confirmRide}
            setridePopupPanel={setRidePopupPanel} 
            setConfirmRidePopupPanel={setConfirmRidePopupPanel} />

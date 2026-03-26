@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel }) => {
+const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel, distanceTime }) => {
   const [message, setMessage] = useState('')
   const navigate = useNavigate()
 
@@ -10,6 +10,7 @@ const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel }) =>
     name: confirmedRide?.captain?.fullname
       ? `${confirmedRide.captain.fullname.firstname} ${confirmedRide.captain.fullname.lastname || ''}`.trim()
       : 'Finding captain...',
+    otp: confirmedRide?.otp,
     rating: 4.8,
     trips: 1247,
     photo: 'https://randomuser.me/api/portraits/men/32.jpg',
@@ -31,7 +32,7 @@ const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel }) =>
 
   const handleStartRide = () => {
     navigate('/riding', {
-      state: { ride, pickup, dropoff, captain }
+      state: { ride, pickup, dropoff, captain, confirmedRide, distanceTime }
     })
   }
 
@@ -103,11 +104,9 @@ const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel }) =>
 
       {/* ===== Quick Actions (Share + Call) ===== */}
       <div className="grid grid-cols-2 gap-3 mb-5">
-        <button className="flex items-center justify-center gap-2 bg-gray-50 rounded-xl py-3.5 hover:bg-gray-100 active:scale-[0.98] transition-all cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4.5 h-4.5 text-blue-600">
-            <path fillRule="evenodd" d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clipRule="evenodd" />
-          </svg>
-          <span className="text-sm font-semibold text-gray-900">Share Trip</span>
+        <button className="flex flex-col items-center justify-center gap-1 bg-gray-50 rounded-xl py-3.5 hover:bg-gray-100 active:scale-[0.98] transition-all cursor-pointer">
+          <span className="text-[14px] font-semibold text-gray-400 uppercase tracking-wider">OTP</span>
+          <span className="text-xl font-bold text-gray-900 tracking-widest">{captain.otp || '----'}</span>
         </button>
         <button className="flex items-center justify-center gap-2 bg-green-50 rounded-xl py-3.5 hover:bg-green-100 active:scale-[0.98] transition-all cursor-pointer">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4.5 h-4.5 text-green-600">
@@ -138,7 +137,7 @@ const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel }) =>
         <div className="border-t border-gray-200 pt-3 mt-1 space-y-2">
           <div className="flex justify-between">
             <span className="text-sm text-gray-500">Distance</span>
-            <span className="text-sm font-medium text-gray-900">4.2 km</span>
+            <span className="text-sm font-medium text-gray-900">{distanceTime?.distance ? `${distanceTime.distance.text} away` : 'Calculating...'}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-sm text-gray-500">Vehicle</span>

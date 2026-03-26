@@ -82,7 +82,7 @@ const confirmride = async ({rideId, captainid}) => {
              status: "accepted"
             });
 
-        const ride = await Ride.findOne({_id: rideId}).populate("user").populate("captain");
+        const ride = await Ride.findOne({_id: rideId}).populate("user").populate("captain").select('+otp');
         if(!ride){
             throw new Error("Ride not found");
         }

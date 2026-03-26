@@ -10,6 +10,8 @@ const Riding = () => {
     ride = { name: 'UberGo', price: 193, image: '' },
     pickup = 'Pickup Location',
     dropoff = 'Dropoff Location',
+    confirmedRide = null,
+    distanceTime = null,
     captain = {
       name: 'Rajesh Kumar',
       rating: 4.8,
@@ -17,6 +19,12 @@ const Riding = () => {
       vehicle: { name: 'Maruti Swift Dzire', plate: 'DL 4C AB 1234', color: 'White' },
     }
   } = location.state || {}
+
+  // Prefer backend data where available
+  const displayPickup    = confirmedRide?.pickup      || pickup
+  const displayDropoff   = confirmedRide?.destination || dropoff
+  const displayFare      = confirmedRide?.fare        || ride.price
+  const displayDistance  = distanceTime?.distance?.text || '—'
 
   // Vehicle animation position
   const [position, setPosition] = useState(0)
@@ -188,12 +196,12 @@ const Riding = () => {
               <div className="w-2 h-2 bg-red-500 rounded-sm" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-900 truncate">{pickup}</p>
+              <p className="text-xs font-medium text-gray-900 truncate">{displayPickup}</p>
               <div className="h-2.5" />
-              <p className="text-xs font-medium text-gray-900 truncate">{dropoff}</p>
+              <p className="text-xs font-medium text-gray-900 truncate">{displayDropoff}</p>
             </div>
             <div className="text-right shrink-0">
-              <p className="text-xs text-gray-400">4.2 km</p>
+              <p className="text-xs text-gray-400">{displayDistance}</p>
             </div>
           </div>
         </div>
@@ -201,7 +209,7 @@ const Riding = () => {
         {/* Pay button */}
         <button
           onClick={() => {
-            alert(`Payment of ₹${ride.price} completed!\nThank you for riding with Uber.`)
+            alert(`Payment of ₹${displayFare} completed!\nThank you for riding with Uber.`)
             navigate('/home')
           }}
           className="w-full py-4 bg-green-600 text-white font-bold text-base rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/25 flex items-center justify-center gap-2"
@@ -210,7 +218,7 @@ const Riding = () => {
             <path fillRule="evenodd" d="M1 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4Zm12 4a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM4 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm13-1a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" clipRule="evenodd" />
             <path d="M1 14.5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-2Z" />
           </svg>
-          Pay ₹{ride.price}
+          Pay ₹{displayFare}
         </button>
       </div>
     </div>
