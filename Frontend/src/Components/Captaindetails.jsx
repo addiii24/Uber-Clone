@@ -1,26 +1,29 @@
-import React from 'react'
+import {useContext} from 'react'
+import { CaptainDataContext } from '../Context/Captaincontext'
 
  // Simulated captain data
-  const captain = {
-    name: 'Rajesh Kumar',
-    rating: 4.8,
-    photo: 'https://randomuser.me/api/portraits/men/32.jpg',
-    vehicle: { name: 'Maruti Swift Dzire', plate: 'DL 4C AB 1234', color: 'White' },
-  }
+const captain = {
+  name: "John Doe",
+  rating: 4.9,
+  photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80",
+}
 
-const Captaindetails = ({ setRidePopupPanel }) => {
+const Captaindetails = ({ setRidePopupPanel, captainData }) => {
+
+  // const { captainData } = useContext(CaptainDataContext)
+
   return (
     <div> 
         {/* Captain info row */}
         <div className="flex items-center gap-3 mb-5">
           <img
-            src={captain.photo}
-            alt={captain.name}
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80"
+            alt={captainData?.fullname?.firstname}
             className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md"
           />
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-bold text-gray-900 truncate">{captain.name}</h3>
-            <p className="text-xs text-gray-500">{captain.vehicle.color} {captain.vehicle.name}</p>
+            <h3 className="text-base font-bold text-gray-900 truncate">{`${captainData?.fullname?.firstname || 'Captain'} ${captainData?.fullname?.lastname || ''}`.trim()}</h3>
+            <p className="text-xs text-gray-500">{captainData?.vehicle?.color || 'No color'} {captainData?.vehicle?.name || captainData?.vehicle?.vehicletype || 'Vehicle'}</p>
             <div className="flex items-center gap-1 mt-0.5">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 text-yellow-400">
                 <path fillRule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clipRule="evenodd" />
@@ -29,7 +32,7 @@ const Captaindetails = ({ setRidePopupPanel }) => {
             </div>
           </div>
           <span className="bg-gray-100 text-[11px] font-bold text-gray-900 px-2.5 py-1 rounded-lg">
-            {captain.vehicle.plate}
+            {captainData?.vehicle?.plate}
           </span>
         </div>
 
@@ -92,4 +95,4 @@ const Captaindetails = ({ setRidePopupPanel }) => {
   )
 }
 
-export default Captaindetails
+export default Captaindetails

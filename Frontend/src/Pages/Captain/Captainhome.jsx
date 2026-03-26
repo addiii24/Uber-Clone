@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import Captaindetails from '../../Components/Captaindetails'
 import Ridepopup from '../../Components/Ridepopup'
 import Confirmridepopup from '../../Components/Confirmridepopup'
@@ -12,9 +13,28 @@ const Captainhome = () => {
   const [captainPanel, setCaptainPanel] = useState(true)
   const [ridePopupPanel, setRidePopupPanel] = useState(true)
   const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false)
+  const [captainData, setCaptainData] = useState(null)
   const ridePopupPanelRef = useRef(null)
   const captainPanelRef = useRef(null)
   const confirmRidePopupPanelRef = useRef(null)
+
+  const fetchCaptain = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/captains/profile`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+      setCaptainData(response.data?.user || response.data || null)
+    } catch (error) {
+      console.log('fetchCaptain error', error)
+      setCaptainData(null)
+    }
+  }
+
+  useEffect(() => {
+    fetchCaptain()
+  }, [])
 
   // Animate RidePopup panel
   useGSAP(() => {
@@ -67,8 +87,8 @@ const Captainhome = () => {
     }
   }, [confirmRidePopupPanel])
 
-   return (
-   <div className="h-screen w-full max-w-md mx-auto relative overflow-hidden bg-gray-100 font-['Inter',sans-serif] flex flex-col">
+  return (
+    <div className="h-screen w-full max-w-md mx-auto relative overflow-hidden bg-gray-100 font-['Inter',sans-serif] flex flex-col">
 
       {/* ===== MAP AREA ===== */}
       <div className="relative flex-1 min-h-0">
@@ -88,19 +108,6 @@ const Captainhome = () => {
             alt="Uber"
           />
 
-          {/* Online/Offline toggle - top middle
-          <button
-            onClick={() => setIsOnline(!isOnline)}
-            className={`flex items-center gap-2.5 px-6 py-2.5 rounded-full shadow-lg font-semibold text-sm transition-all active:scale-95 cursor-pointer ${
-              isOnline
-                ? 'bg-green-600 text-white shadow-green-600/30'
-                : 'bg-white text-gray-700 shadow-gray-200/50'
-            }`}
-          >
-            <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-white animate-pulse' : 'bg-red-500'}`} />
-            {isOnline ? 'Online' : 'Offline'}
-          </button> */}
-
           {/* Logout button - top right */}
           <button
             onClick={() => navigate('/captain-logout')}
@@ -112,28 +119,6 @@ const Captainhome = () => {
             </svg>
           </button>
         </div>
-
-        {/* ===== Status text below top bar ===== */}
-        {/* <div className="absolute top-[72px] left-0 right-0 z-20 flex justify-center">
-          <h2 className={`text-sm font-bold ${isOnline ? 'text-green-700' : 'text-gray-700'}`}>
-            {isOnline ? '🟢 You are Online' : '🔴 You are Offline'}
-          </h2>
-        </div> */}
-
-        {/* ===== Offline overlay message on map ===== */}
-        {/* {!isOnline && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
-            <div className="bg-white rounded-2xl px-8 py-6 text-center shadow-2xl max-w-[280px] animate-[fadeIn_0.3s_ease]">
-              <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 text-red-500">
-                  <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1">You are offline!</h3>
-              <p className="text-sm text-gray-500 mb-5">Go online to start accepting rides</p>
-            </div>
-          </div>
-        )} */}
 
         {/* Online location marker */}
 
@@ -148,6 +133,7 @@ const Captainhome = () => {
       {/* ===== CAPTAIN DETAILS BOTTOM PANEL ===== */}
       <div
         ref={captainPanelRef}
+
         className="fixed bottom-0 left-0 right-0 z-20 max-w-md mx-auto"
       >
         <div className="bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] px-5 pt-4 pb-5">
@@ -155,7 +141,7 @@ const Captainhome = () => {
           <div className="flex justify-center mb-3 cursor-pointer py-2 -my-2" onClick={() => setCaptainPanel(!captainPanel)}>
             <div className="w-10 h-1 bg-gray-300 rounded-full" />
           </div>
-          <Captaindetails setRidePopupPanel={setRidePopupPanel} />
+          <Captaindetails captainData={captainData} setRidePopupPanel={setRidePopupPanel} />
         </div>
       </div>
 
