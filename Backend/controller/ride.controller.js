@@ -16,29 +16,41 @@ const createRide = async (req, res) => {
         const ride = await rideService.createride({userid, pickup, destination, vehicleType});
         res.status(201).json({success: true, ride});
 
-        const Pickupcoordinates = await getAddressCoordinates(pickup);
-        const Destinationcoordinates = await getAddressCoordinates(destination);
-        
-        console.log({Pickupcoordinates, Destinationcoordinates})
+        // ---- Everything below runs AFTER the 201 is sent ----
+        console.log("🚗 Ride created:", ride._id, "| geocoding pickup...");
 
-        const CaptainInRadius = await getCaptainInTheRadius(Pickupcoordinates.ltd, Pickupcoordinates.lng);
+        let CaptainInRadius = [];
+        try {
+            const Pickupcoordinates = await getAddressCoordinates(pickup);
+            console.log("📍 Pickup coordinates:", Pickupcoordinates);
 
-        ride.otp = ""
+            CaptainInRadius = await getCaptainInTheRadius(Pickupcoordinates.ltd, Pickupcoordinates.lng);
+            console.log(`👥 Captains found via $near: ${CaptainInRadius.length}`);
+        } catch (geoErr) {
+            console.warn("⚠️ Geo lookup failed:", geoErr.message, "— falling back to all captains");
+        }
 
+        // Fallback: if geo query returns 0, get all captains who have a socketId
+        if (CaptainInRadius.length === 0) {
+            console.log("🔄 Fallback: fetching all captains with socketId...");
+            CaptainInRadius = await captainModel.find({ socketId: { $exists: true, $ne: null } });
+            console.log(`👥 Fallback captains found: ${CaptainInRadius.length}`);
+        }
+
+        ride.otp = "";
         const rideWithUser = await Ride.findOne({ _id: ride._id }).populate('user');
 
-
-        CaptainInRadius.map(captain => {
+        CaptainInRadius.forEach(captain => {
             if (captain.socketId) {
-                SendMessageToSocketid(captain.socketId, "new-ride", rideWithUser)
+                console.log(`📤 Sending new-ride to captain ${captain._id} (socket: ${captain.socketId})`);
+                SendMessageToSocketid(captain.socketId, "new-ride", rideWithUser);
             } else {
-                console.warn(`Captain ${captain._id} has no socketId, skipping`)
+                console.warn(`⚠️ Captain ${captain._id} has no socketId, skipping`);
             }
-        })
-           
+        });
+
     } catch (error) {
-        // If response not yet sent, send error. Otherwise just log it.
-        console.error("createRide error:", error.message)
+        console.error("createRide error:", error.message);
         if (!res.headersSent) {
             res.status(500).json({success: false, message: error.message});
         }

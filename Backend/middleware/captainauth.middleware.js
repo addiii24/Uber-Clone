@@ -21,7 +21,8 @@ export const authcaptain = async (req, res, next) => {
         if (!user) {
             return res.status(401).json({ message: "Unauthorized User" });
         }
-        req.user = user; 
+        req.captain = user;
+        req.user = user;
         req.token = token; 
         next();
     } catch (error) {

@@ -22,6 +22,7 @@ const Home = () => {
   const [showConfirm, setShowConfirm] = useState(false)
   const [showLooking, setShowLooking] = useState(false)
   const [showWaiting, setShowWaiting] = useState(false)
+  const [confirmedRide, setConfirmedRide] = useState(null)  // backend ride from socket
   const [fare, setFare] = useState({})
   const [distanceTime, setDistanceTime] = useState(null)
 
@@ -38,9 +39,9 @@ const Home = () => {
 
   useEffect(() => {
     socket.on('ride-confirmed', (ride) => {
+      setConfirmedRide(ride)   // backend ride object (has captain, fare, user etc.)
       setShowLooking(false)
       setShowWaiting(true)
-      setSelectedRide(ride)
     })
     return () => socket.off('ride-confirmed')
   }, [socket])
@@ -192,7 +193,7 @@ const Home = () => {
       await axios.post(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/ride/create-ride`, {
         pickup,
         destination: dropoff,
-        vehicleType: selectedRide?.id
+        vehicleType: selectedRide
       }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
@@ -308,7 +309,8 @@ const Home = () => {
           {/* ===== WAITING FOR DRIVER VIEW ===== */}
           {showWaiting && selectedRide ? (
             <Waitingfordriver
-              ride={selectedRide}
+              ride={rides.find(r => r.id === selectedRide)}
+              confirmedRide={confirmedRide}
               pickup={pickup}
               dropoff={dropoff}
               onCancel={handleCancelWaiting}

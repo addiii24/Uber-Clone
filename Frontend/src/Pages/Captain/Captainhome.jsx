@@ -27,23 +27,20 @@ const Captainhome = () => {
   const socket = useContext(SocketContext)   // context value IS the socket, not {socket}
 
   const confirmRide = async () => {
-
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/ride/confirm`, {
-
-            rideId: ride._id,
-            captainId: captain._id,
-
-
-        }, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('captain-token')}`
-            }
-        })
-
-        setRidePopupPanel(false)
-        setConfirmRidePopupPanel(true)
-
+    try {
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/ride/confirm`, {
+        rideId: ride._id,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('captain-token')}`
+        }
+      })
+      setRidePopupPanel(false)
+      setConfirmRidePopupPanel(true)
+    } catch (err) {
+      console.error("confirmRide error:", err.response?.data || err.message)
     }
+  }
 
 
   useEffect(() => {

@@ -1,20 +1,22 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const Waitingfordriver = ({ ride, pickup, dropoff, onCancel }) => {
+const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel }) => {
   const [message, setMessage] = useState('')
   const navigate = useNavigate()
 
-  // Simulated captain data
+  // Use real backend captain data if available, fallback to placeholders
   const captain = {
-    name: 'Rajesh Kumar',
+    name: confirmedRide?.captain?.fullname
+      ? `${confirmedRide.captain.fullname.firstname} ${confirmedRide.captain.fullname.lastname || ''}`.trim()
+      : 'Finding captain...',
     rating: 4.8,
     trips: 1247,
     photo: 'https://randomuser.me/api/portraits/men/32.jpg',
     vehicle: {
-      name: ride.name === 'Moto' ? 'Honda Activa' : ride.name === 'Auto' ? 'Bajaj RE' : 'Maruti Swift Dzire',
-      plate: 'DL 4C AB 1234',
-      color: ride.name === 'Moto' ? 'Black' : ride.name === 'Auto' ? 'Green-Yellow' : 'White',
+      name: confirmedRide?.captain?.vehicle?.vehicletype || (ride?.name === 'Moto' ? 'Honda Activa' : ride?.name === 'Auto' ? 'Bajaj RE' : 'Maruti Swift Dzire'),
+      plate: confirmedRide?.captain?.vehicle?.plate || 'DL 4C AB 1234',
+      color: confirmedRide?.captain?.vehicle?.color || (ride?.name === 'Moto' ? 'Black' : ride?.name === 'Auto' ? 'Green-Yellow' : 'White'),
     },
   }
 
@@ -149,8 +151,8 @@ const Waitingfordriver = ({ ride, pickup, dropoff, onCancel }) => {
           <div className="flex justify-between">
             <span className="text-sm text-gray-500">Fare</span>
             <div>
-              <span className="text-sm font-bold text-gray-900">₹{ride.price}</span>
-              {ride.originalPrice && (
+                          <span className="text-sm font-bold text-gray-900">₹{confirmedRide?.fare || ride?.price}</span>
+              {!confirmedRide && ride?.originalPrice && (
                 <span className="text-xs text-gray-400 line-through ml-1.5">₹{ride.originalPrice}</span>
               )}
             </div>
