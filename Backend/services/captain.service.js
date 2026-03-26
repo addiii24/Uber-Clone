@@ -31,4 +31,12 @@ const createcaptain = async (firstname, lastname, email, password, color, plate,
     return captain;
 }
 
-export { createcaptain };
+const getcaptain = async (email) => {
+    const captain = await captainModel.findOne({ email });
+    if (!captain) {
+        throw new Error("Captain not found");
+    }
+    return captain;
+}
+
+export { createcaptain, getcaptain };

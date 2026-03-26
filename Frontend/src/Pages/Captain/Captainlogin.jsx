@@ -1,4 +1,4 @@
-import React from 'react'
+  import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useState, useContext } from 'react'
 import axios from 'axios'
@@ -29,7 +29,7 @@ const Captainlogin = () => {
 
       if (response.status === 200) {
         const data = response.data
-        setCaptain(data.captain)
+        setCaptain(data.user || data.captain || null)
         localStorage.setItem('captain-token', data.token)
         setemail('')
         setpassword('')
