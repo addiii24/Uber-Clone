@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import axios from 'axios'
 import { SocketContext } from '../../Context/Socketiocontext'
 import { UserDataContext } from '../../Context/Usercontext'
 import Livetracking from '../../Components/Livetracking'
@@ -25,6 +26,8 @@ const Riding = () => {
     })
     return () => socket.off("ride-ended")
   }, [socket])
+
+
 
   // Get ride data from navigation state or use defaults
   const {
@@ -56,32 +59,39 @@ const Riding = () => {
     }
   }
 
-  // Vehicle animation position
-  const [position, setPosition] = useState(0)
-  const [eta, setEta] = useState(12)
+  const [captainLocation, setCaptainLocation] = useState(null)
+  const [eta, setEta] = useState('Calculating...')
   const [panelMinimized, setPanelMinimized] = useState(false)
 
-  // Animate vehicle moving along the route
   useEffect(() => {
-    const moveInterval = setInterval(() => {
-      setPosition(prev => {
-        if (prev >= 100) return 0
-        return prev + 0.3
-      })
-    }, 50)
-    return () => clearInterval(moveInterval)
-  }, [])
+    if (!socket) return
+    socket.on('captain-location', async (data) => {
+      setCaptainLocation(data.location)
+      
+      // Calculate real ETA from Captain to Destination
+      if (displayDropoff) {
+        try {
+          const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/map/get-distance-time`, {
+            params: {
+              origin: `${data.location.ltd},${data.location.lng}`,
+              destination: displayDropoff
+            },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          if (response.data && response.data.duration) {
+            setEta(response.data.duration.text)
+          }
+        } catch (err) {
+          console.error("Error fetching ride ETA:", err)
+        }
+      }
+    })
+    return () => socket.off('captain-location')
+  }, [socket, displayDropoff])
 
-  // Countdown ETA
-  useEffect(() => {
-    const etaTimer = setInterval(() => {
-      setEta(prev => {
-        if (prev <= 0) return 0
-        return prev - 1
-      })
-    }, 60000) // every minute
-    return () => clearInterval(etaTimer)
-  }, [])
+
 
 
 
@@ -91,7 +101,11 @@ const Riding = () => {
       {/* ===== MAP AREA ===== */}
       <div className="relative flex-1 min-h-0">
         {/* Live Google Map */}
-        <Livetracking pickup={displayPickup} destination={displayDropoff} />
+        <Livetracking 
+          pickup={displayPickup} 
+          destination={displayDropoff} 
+          captainLocation={captainLocation}
+        />
 
         {/* Top gradient overlay */}
         <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/50 to-transparent pointer-events-none" />
@@ -119,7 +133,7 @@ const Riding = () => {
         <div className="bg-green-600 text-white rounded-xl px-4 py-3 mb-4 flex items-center justify-between">
           <div>
             <p className="text-[10px] font-medium text-green-200 uppercase tracking-wider">Arriving at destination</p>
-            <p className="text-xl font-bold">{eta} min</p>
+            <p className="text-xl font-bold">{eta}</p>
           </div>
           <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-white">

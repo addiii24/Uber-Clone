@@ -7,6 +7,7 @@ import { CaptainDataContext } from '../../Context/Captaincontext.jsx'
 const Captainlogin = () => {
   const [email, setemail] = useState("")
   const [password, setpassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
 
   const { captain, setCaptain } = useContext(CaptainDataContext)
   const navigate = useNavigate();
@@ -65,10 +66,21 @@ const Captainlogin = () => {
             required
             value={password}
             onChange={(e) => setpassword(e.target.value)}
-            className='bg-[#eeeeee] mb-7 rounded-xl px-4 py-2 border w-full text-lg placeholder:text-base outline-none focus:ring-2 focus:ring-black'
-            type="password"
+            className='bg-[#eeeeee] mb-2 rounded-xl px-4 py-2 border w-full text-lg placeholder:text-base outline-none focus:ring-2 focus:ring-black'
+            type={showPassword ? "text" : "password"}
             placeholder='password'
           />
+
+          <div className='flex items-center gap-2 mb-7'>
+            <input
+              type="checkbox"
+              id="showPassword"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+              className='w-4 h-4 cursor-pointer'
+            />
+            <label htmlFor="showPassword" size='text-sm text-gray-600 cursor-pointer'>Show Password</label>
+          </div>
 
           <button
             type='submit'

@@ -10,6 +10,41 @@ import { UserDataContext } from '../../Context/Usercontext'
 import Livetracking from '../../Components/Livetracking'
 
 const Home = () => {
+  // Ride options data
+  const rides = [
+    {
+      id: 'car',
+      name: 'UberGo',
+      image: 'https://swyft.pl/wp-content/uploads/2023/05/how-many-people-can-a-uberx-take.jpg',
+      seats: '4',
+      eta: '2 mins away',
+      price: 193,
+      originalPrice: 225,
+      tag: 'Cheapest',
+      description: 'Affordable, compact rides',
+    },
+    {
+      id: 'moto',
+      name: 'Moto',
+      image: 'https://imgs.search.brave.com/3OfMItnu_TZ5JBJQk5KHo678LBg9r6urMdw7c-sjT14/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHNkLWdyYXR1aXRh/cy9zY29vdGVyLWxh/cmFuamEtZWxlZ2Fu/dGUtdmVpY3Vsby1k/ZS10cmFuc3BvcnRl/LWRlLWRlc2lnbi1t/b2Rlcm5vXzYzMjQ5/OC01MzM1Ny5qcGc_/c2VtdD1haXNfaHli/cmlkJnc9NzQw',
+      seats: '1',
+      eta: '3 mins away',
+      price: 65,
+      tag: 'Fastest',
+      description: 'Affordable motorcycle rides',
+    },
+    {
+      id: 'auto',
+      name: 'Auto',
+      image: 'https://imgs.search.brave.com/r4DFS316mXJUGmhxw_XACKGsGjKi0EYnwy_quLeOv3I/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzA5LzU5LzY4Lzgx/LzM2MF9GXzk1OTY4/ODE1MF9JUkxPV3pF/QzF0RWxGeFZYSnpI/RzNtRk9VbnlndFhP/Ni5qcGc',
+      seats: '3',
+      eta: '5 mins away',
+      price: 118,
+      originalPrice: 140,
+      description: 'No bargaining, doorstep pickup',
+    },
+  ]
+
   const [pickup, setPickup] = useState('')
   const [dropoff, setDropoff] = useState('')
   const [panelOpen, setPanelOpen] = useState(false)
@@ -51,13 +86,21 @@ const Home = () => {
 
   useEffect(() => {
     socket.on("ride-started", (ride) => {
+      console.log("🚀 Ride started:", ride);
       setShowWaiting(false)
       setShowLooking(false)
       setShowConfirm(false)
-      navigate('/riding', { state: { confirmedRide: ride } })
+      navigate('/riding', { 
+        state: { 
+          confirmedRide: ride, 
+          pickup: ride.pickup,
+          dropoff: ride.destination,
+          ride: rides.find(r => r.id === ride.vehicleType)
+        } 
+      })
     })
     return () => socket.off('ride-started')
-  }, [socket])
+  }, [socket, rides])
 
   useEffect(() => {
     socket.on('captain-location', async (data) => {
@@ -87,41 +130,6 @@ const Home = () => {
   }, [socket, showWaiting, pickup])
     
   
-
-  // Ride options data
-  const rides = [
-    {
-      id: 'car',
-      name: 'UberGo',
-      image: 'https://swyft.pl/wp-content/uploads/2023/05/how-many-people-can-a-uberx-take.jpg',
-      seats: '4',
-      eta: '2 mins away',
-      price: 193,
-      originalPrice: 225,
-      tag: 'Cheapest',
-      description: 'Affordable, compact rides',
-    },
-    {
-      id: 'moto',
-      name: 'Moto',
-      image: 'https://imgs.search.brave.com/3OfMItnu_TZ5JBJQk5KHo678LBg9r6urMdw7c-sjT14/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHNkLWdyYXR1aXRh/cy9zY29vdGVyLWxh/cmFuamEtZWxlZ2Fu/dGUtdmVpY3Vsby1k/ZS10cmFuc3BvcnRl/LWRlLWRlc2lnbi1t/b2Rlcm5vXzYzMjQ5/OC01MzM1Ny5qcGc_/c2VtdD1haXNfaHli/cmlkJnc9NzQw',
-      seats: '1',
-      eta: '3 mins away',
-      price: 65,
-      tag: 'Fastest',
-      description: 'Affordable motorcycle rides',
-    },
-    {
-      id: 'auto',
-      name: 'Auto',
-      image: 'https://imgs.search.brave.com/r4DFS316mXJUGmhxw_XACKGsGjKi0EYnwy_quLeOv3I/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzA5LzU5LzY4Lzgx/LzM2MF9GXzk1OTY4/ODE1MF9JUkxPV3pF/QzF0RWxGeFZYSnpI/RzNtRk9VbnlndFhP/Ni5qcGc',
-      seats: '3',
-      eta: '5 mins away',
-      price: 118,
-      originalPrice: 140,
-      description: 'No bargaining, doorstep pickup',
-    },
-  ]
 
   // Saved locations
   const savedLocations = [

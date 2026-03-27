@@ -4,6 +4,9 @@ import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import Finishride from '../../Components/Finishride'
 import Livetracking from '../../Components/Livetracking'
+import { SocketContext } from '../../Context/Socketiocontext'
+import { CaptainDataContext } from '../../Context/Captaincontext'
+import { useContext } from 'react'
 
 const Captainriding = () => {
 
@@ -13,8 +16,10 @@ const Captainriding = () => {
   const location = useLocation()
   const { ride = null } = location?.state || {}
 
-  const [finishRidePanel, setFinishRidePanel] = useState(true)
+  const [finishRidePanel, setFinishRidePanel] = useState(false) // Start closed, peek via GSAP
   const finishRidePanelRef = useRef(null)
+  const [distanceTime, setDistanceTime] = useState(null)
+  const [captainLocation, setCaptainLocation] = useState(null)
 
   useGSAP(() => {
     if (Panelopen) {
@@ -59,8 +64,68 @@ const Captainriding = () => {
   }
 
   const handleCompleteRide = () => {
-    navigate('/captain-home')
+    setFinishRidePanel(true)
   }
+
+  const socket = useContext(SocketContext)
+  const { captain } = useContext(CaptainDataContext)
+
+  useEffect(() => {
+    if (!socket || !captain?._id) return
+    socket.emit('join', { userId: captain._id, userType: 'captain' })
+  }, [socket, captain])
+
+  useEffect(() => {
+    if (!socket || !captain?._id) return
+
+    const updateLoc = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const loc = {
+            ltd: position.coords.latitude,
+            lng: position.coords.longitude
+          }
+          setCaptainLocation(loc)
+          socket.emit('update-location-captain', {
+            userId: captain._id,
+            location: loc
+          })
+        })
+      }
+    }
+
+    const interval = setInterval(updateLoc, 10000)
+    updateLoc()
+
+    return () => clearInterval(interval)
+  }, [socket, captain])
+
+  useEffect(() => {
+    if (!ride?.destination || !captainLocation) return
+
+    const fetchDistance = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/map/get-distance-time`, {
+          params: {
+            origin: `${captainLocation.ltd},${captainLocation.lng}`, 
+            destination: ride.destination
+          },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('captain-token')}`
+          }
+        })
+        if (response.data) {
+          setDistanceTime(response.data)
+        }
+      } catch (err) {
+        console.error("Error fetching distance:", err)
+      }
+    }
+
+    fetchDistance()
+    const distInterval = setInterval(fetchDistance, 30000) // update distance every 30s
+    return () => clearInterval(distInterval)
+  }, [ride, captainLocation])
   return (
     <div className="h-screen w-full max-w-md mx-auto relative overflow-hidden bg-gray-100 font-['Inter',sans-serif] flex flex-col">
 
@@ -110,8 +175,10 @@ const Captainriding = () => {
           </div>
 
           <div className="flex items-center justify-between w-full mt-5 gap-6">
-            <h2 className="text-xl font-bold text-gray-900 whitespace-nowrap">4 KM Away</h2>
-            <button className="flex-1 py-4 bg-green-600 text-white font-bold text-lg rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/30 flex items-center justify-center gap-2">
+            <h2 className="text-xl font-bold text-gray-900 whitespace-nowrap">{distanceTime?.distance?.text || 'Calculating...'}</h2>
+            <button 
+              onClick={handleCompleteRide}
+              className="flex-1 py-4 bg-green-600 text-white font-bold text-lg rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/30 flex items-center justify-center gap-2">
               Complete Ride
             </button>
           </div>
@@ -128,6 +195,7 @@ const Captainriding = () => {
         }}>
           <Finishride
             ride={ride}
+            distanceTime={distanceTime}
             setFinishRidePanel={setFinishRidePanel} />
         </div>
       </div>

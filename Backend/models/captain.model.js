@@ -66,24 +66,24 @@ const captainSchema = new mongoose.Schema({
         }
     },
 
-    // ✅ FIXED LOCATION FIELD (GeoJSON)
+    // ✅ FIXED LOCATION FIELD (GeoJSON) - Optional until captain sets location
     location: {
         type: {
             type: String,
             enum: ["Point"],
-            default: "Point"
+            required: false
         },
         coordinates: {
             type: [Number], // [longitude, latitude]
-            default: undefined
+            required: false
         }
     }
 
 }, { timestamps: true });
 
 
-// ✅ REQUIRED FOR GEO QUERIES
-captainSchema.index({ location: "2dsphere" });
+// ✅ SPARSE INDEX - Only indexes documents where location exists
+captainSchema.index({ location: "2dsphere" }, { sparse: true });
 
 
 // 🔐 AUTH METHODS
