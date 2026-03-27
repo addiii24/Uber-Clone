@@ -89,4 +89,20 @@ const confirmRide = async (req, res) => {
     }
 }
 
-export {createRide, getFare, confirmRide} ; 
+const startRide = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(400).json({success: false, errors: errors.array()});
+        }
+        const { rideId, otp } = req.query;
+        const ride = await rideService.startride({rideId, otp, captainid: req.captain._id});
+        res.status(200).json({success: true, ride});
+
+        SendMessageToSocketid(ride.user.socketId, "ride-started", ride);
+    } catch (error) {
+        res.status(500).json({success: false, message: error.message});
+    }
+}
+
+export {createRide, getFare, confirmRide, startRide} ; 

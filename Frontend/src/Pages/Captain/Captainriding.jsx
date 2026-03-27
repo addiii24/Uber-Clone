@@ -1,19 +1,21 @@
-import React from 'react'
-import {Link, useNavigate} from 'react-router-dom'
-import { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import Finishride from '../../Components/Finishride'
 
 const Captainriding = () => {
 
-      const [Panelopen, setPanelopen] = useState(true)
-      const Panelopenref = useRef(null)
+  const [Panelopen, setPanelopen] = useState(true)
+  const Panelopenref = useRef(null)
 
-      const [finishRidePanel, setFinishRidePanel] = useState(true)
-      const finishRidePanelRef = useRef(null)
+  const location = useLocation()
+  const { ride = null } = location?.state || {}
 
-        useGSAP(() => {
+  const [finishRidePanel, setFinishRidePanel] = useState(true)
+  const finishRidePanelRef = useRef(null)
+
+  useGSAP(() => {
     if (Panelopen) {
       gsap.to(Panelopenref.current, {
         transform: 'translateY(0)',
@@ -45,19 +47,19 @@ const Captainriding = () => {
     }
   }, [finishRidePanel])
 
-    const navigate = useNavigate()
+  const navigate = useNavigate()
 
-    const handleLogout = () => {
-        navigate('/captain-logout')
-    }
+  const handleLogout = () => {
+    navigate('/captain-logout')
+  }
 
-    const handleHome = () => {
-        navigate('/captain-home')
-    }
+  const handleHome = () => {
+    navigate('/captain-home')
+  }
 
-    const handleCompleteRide = () => {
-        navigate('/captain-home')
-    }
+  const handleCompleteRide = () => {
+    navigate('/captain-home')
+  }
   return (
     <div className="h-screen w-full max-w-md mx-auto relative overflow-hidden bg-gray-100 font-['Inter',sans-serif] flex flex-col">
 
@@ -79,7 +81,7 @@ const Captainriding = () => {
             alt="Uber"
           />
 
-           {/* Logout button - top right */}
+          {/* Logout button - top right */}
           <button
             onClick={handleLogout}
             className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
@@ -98,15 +100,15 @@ const Captainriding = () => {
           </div>
         </div>
         {/* ===== BOTTOM PANEL ===== */}
-        <div 
-        ref = {Panelopenref}
-        onClick={() => setFinishRidePanel(true)}
-        className="pt-11.5 pb-6 px-6 bg-yellow-400 flex items-center justify-between relative rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.15)] flex-col -mt-4 z-20 cursor-pointer">
+        <div
+          ref={Panelopenref}
+          onClick={() => setFinishRidePanel(true)}
+          className="pt-11.5 pb-6 px-6 bg-yellow-400 flex items-center justify-between relative rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.15)] flex-col -mt-4 z-20 cursor-pointer">
           {/* Drag handle */}
           <div className="w-full absolute top-2 left-0 flex justify-center cursor-pointer p-2" onClick={(e) => { e.stopPropagation(); setPanelopen(!Panelopen) }}>
             <div className="w-10 h-1.5 bg-yellow-600 rounded-full" />
           </div>
-          
+
           <div className="flex items-center justify-between w-full mt-5 gap-6">
             <h2 className="text-xl font-bold text-gray-900 whitespace-nowrap">4 KM Away</h2>
             <button className="flex-1 py-4 bg-green-600 text-white font-bold text-lg rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/30 flex items-center justify-center gap-2">
@@ -122,9 +124,11 @@ const Captainriding = () => {
         className="fixed bottom-0 left-0 right-0 z-40 max-w-md mx-auto translate-y-full"
       >
         <div className="bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.15)] px-4 pt-4 pb-2" onClick={(e) => {
-            // Only trigger if we click the header area while it's peeking, but Since Finishride has its own click, this may be optional. 
+          // Only trigger if we click the header area while it's peeking, but Since Finishride has its own click, this may be optional. 
         }}>
-          <Finishride setFinishRidePanel={setFinishRidePanel} />
+          <Finishride
+            ride={ride}
+            setFinishRidePanel={setFinishRidePanel} />
         </div>
       </div>
 

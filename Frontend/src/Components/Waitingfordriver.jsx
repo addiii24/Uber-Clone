@@ -160,12 +160,12 @@ const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel, dist
       </div>
 
       {/* ===== Start Ride / Cancel ===== */}
-      <button
+      {/* <button
         onClick={handleStartRide}
         className="w-full py-3.5 bg-black text-white font-bold text-base rounded-2xl hover:bg-gray-900 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-black/20 mb-3"
       >
         Start Ride
-      </button>
+      </button> */}
       <button
         onClick={onCancel}
         className="w-full py-3 text-red-500 font-semibold text-sm rounded-2xl hover:bg-red-50 active:scale-[0.98] transition-all cursor-pointer"

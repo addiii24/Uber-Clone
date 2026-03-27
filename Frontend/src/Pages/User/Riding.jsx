@@ -12,19 +12,28 @@ const Riding = () => {
     dropoff = 'Dropoff Location',
     confirmedRide = null,
     distanceTime = null,
-    captain = {
-      name: 'Rajesh Kumar',
-      rating: 4.8,
-      photo: 'https://randomuser.me/api/portraits/men/32.jpg',
-      vehicle: { name: 'Maruti Swift Dzire', plate: 'DL 4C AB 1234', color: 'White' },
-    }
   } = location.state || {}
 
   // Prefer backend data where available
-  const displayPickup    = confirmedRide?.pickup      || pickup
-  const displayDropoff   = confirmedRide?.destination || dropoff
-  const displayFare      = confirmedRide?.fare        || ride.price
-  const displayDistance  = distanceTime?.distance?.text || '—'
+  const displayPickup   = confirmedRide?.pickup      || pickup
+  const displayDropoff  = confirmedRide?.destination || dropoff
+  const displayFare     = confirmedRide?.fare        || ride.price
+  const displayDistance = distanceTime?.distance?.text || '—'
+
+  // Build captain display object from the populated backend captain
+  const backendCaptain  = confirmedRide?.captain
+  const captain = {
+    name: backendCaptain?.fullname
+      ? `${backendCaptain.fullname.firstname} ${backendCaptain.fullname.lastname || ''}`.trim()
+      : 'Your Captain',
+    rating: 4.8,
+    photo: 'https://randomuser.me/api/portraits/men/32.jpg',
+    vehicle: {
+      name: backendCaptain?.vehicle?.vehicletype || ride.name || 'Vehicle',
+      plate: backendCaptain?.vehicle?.plate || 'XX 00 XX 0000',
+      color: backendCaptain?.vehicle?.color || 'White',
+    }
+  }
 
   // Vehicle animation position
   const [position, setPosition] = useState(0)

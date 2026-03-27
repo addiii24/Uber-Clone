@@ -1,21 +1,36 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
-const Confirmridepopup = ({ onAccept, onDecline, setConfirmRidePopupPanel, setridePopupPanel }) => {
+const Confirmridepopup = ({ ride, setConfirmRidePopupPanel, setRidePopupPanel }) => {
 
     const navigate = useNavigate()
     const [otp, setOtp] = useState('')
+    const [otpError, setOtpError] = useState('')
+    const [loading, setLoading] = useState(false)
 
-    // Simulated ride request data
-    const ride = {
-        passengerName: 'Aditya Sharma',
-        passengerPhoto: 'https://randomuser.me/api/portraits/women/44.jpg',
-        pickup: 'Connaught Place, New Delhi',
-        dropoff: 'IGI Airport T3, New Delhi',
-        distance: '14.2 km',
-        duration: '28 min',
-        fare: 193,
+    const handleConfirmOtp = async (e) => {
+        e.preventDefault()
+        setOtpError('')
+        setLoading(true)
+        try {
+            const res = await axios.get(
+                `${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/ride/start-ride`,
+                {
+                    params: { rideId: ride?._id, otp },
+                    headers: { Authorization: `Bearer ${localStorage.getItem('captain-token')}` }
+                }
+            )
+            if (res.data.success) {
+                setConfirmRidePopupPanel(false)
+                navigate('/captain-riding', { state: { ride: res.data.ride } })
+            }
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Something went wrong'
+            setOtpError(msg)
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -25,22 +40,26 @@ const Confirmridepopup = ({ onAccept, onDecline, setConfirmRidePopupPanel, setri
                 {/* ===== Header ===== */}
                 <div className="text-center mb-4 cursor-pointer" onClick={() => setConfirmRidePopupPanel(false)}>
                     <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3" />
-                    <h2 className="text-lg font-bold text-gray-900">New Ride Request!</h2>
-                    <p className="text-xs text-gray-400 mt-0.5">Respond before it expires</p>
+                    <h2 className="text-lg font-bold text-gray-900">Confirm with OTP</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">Ask passenger for the OTP shown on their screen</p>
                 </div>
 
                 {/* ===== Passenger info ===== */}
                 <div className="flex items-center gap-3 mb-4 mt-6">
                     <img
-                        src={ride.passengerPhoto}
-                        alt={ride.passengerName}
+                        src="https://randomuser.me/api/portraits/women/44.jpg"
+                        alt="Passenger"
                         className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md"
                     />
                     <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-gray-900 truncate">{ride.passengerName}</h3>
+                        <h3 className="text-lg font-bold text-gray-900 truncate">
+                            {ride?.user?.fullname
+                                ? `${ride.user.fullname.firstname} ${ride.user.fullname.lastname || ''}`.trim()
+                                : 'Passenger'}
+                        </h3>
                     </div>
                     <div className="text-right">
-                        <p className="text-lg font-bold text-gray-900">₹{ride.fare}</p>
+                        <p className="text-lg font-bold text-gray-900">₹{ride?.fare}</p>
                         <p className="text-[13px] text-gray-400 font-medium">Cash</p>
                     </div>
                 </div>
@@ -56,65 +75,41 @@ const Confirmridepopup = ({ onAccept, onDecline, setConfirmRidePopupPanel, setri
                         <div className="flex-1 min-w-0">
                             <div className="pb-2.5">
                                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Pickup</p>
-                                <p className="text-sm font-medium text-gray-900 truncate mt-0.5">{ride.pickup}</p>
+                                <p className="text-sm font-medium text-gray-900 truncate mt-0.5">{ride?.pickup}</p>
                             </div>
                             <div className="border-t border-gray-200 pt-2.5">
                                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Dropoff</p>
-                                <p className="text-sm font-medium text-gray-900 truncate mt-0.5">{ride.dropoff}</p>
+                                <p className="text-sm font-medium text-gray-900 truncate mt-0.5">{ride?.destination}</p>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {/* ===== Ride stats ===== */}
-                <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 mb-5">
-                    <div className="flex items-center gap-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-gray-500">
-                            <path fillRule="evenodd" d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-sm font-medium text-gray-700">{ride.distance}</span>
-                    </div>
-                    <div className="w-[1px] h-4 bg-gray-300" />
-                    <div className="flex items-center gap-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-gray-500">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-sm font-medium text-gray-700">{ride.duration}</span>
-                    </div>
-                    <div className="w-[1px] h-4 bg-gray-300" />
-                    <div className="flex items-center gap-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-gray-500">
-                            <path fillRule="evenodd" d="M1 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4Zm12 4a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM4 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm13-1a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" clipRule="evenodd" />
-                            <path d="M1 14.5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-2Z" />
-                        </svg>
-                        <span className="text-sm font-bold text-gray-900">₹{ride.fare}</span>
                     </div>
                 </div>
             </div>
 
             {/* ===== OTP & Action buttons ===== */}
             <div className="pb-8">
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    navigate('/captain-riding')
-                    setConfirmRidePopupPanel(false)
-                }}>
-                    <input 
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                        type="text" 
-                        placeholder="Enter OTP" 
-                        className="bg-gray-100 px-6 py-4 font-mono text-lg rounded-2xl w-full mt-2 mb-5 border border-gray-200 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-all text-center tracking-[0.5em] shadow-inner"
-                        maxLength={4}
+                {otpError && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 text-sm font-medium rounded-xl px-4 py-3 mb-4 text-center">
+                        ❌ {otpError}
+                    </div>
+                )}
+                <form onSubmit={handleConfirmOtp}>
+                    <input
+                        value={otp}
+                        onChange={(e) => { setOtp(e.target.value); setOtpError('') }}
+                        type="text"
+                        placeholder="Enter OTP"
+                        className={`bg-gray-100 px-6 py-4 font-mono text-lg rounded-2xl w-full mt-2 mb-5 border focus:outline-none focus:ring-1 transition-all text-center tracking-[0.5em] shadow-inner ${otpError ? 'border-red-400 focus:border-red-500 focus:ring-red-500' : 'border-gray-200 focus:border-green-500 focus:ring-green-500'}`}
+                        maxLength={6}
                         required
                     />
-                    
+
                     <div className="flex gap-3">
                         <button
                             type="button"
                             onClick={() => {
                                 setConfirmRidePopupPanel(false)
-                                setridePopupPanel(true)
+                                setRidePopupPanel(true)
                             }}
                             className="flex-1 py-3.5 bg-gray-100 text-gray-700 font-bold text-sm rounded-2xl hover:bg-gray-200 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
                         >
@@ -125,12 +120,17 @@ const Confirmridepopup = ({ onAccept, onDecline, setConfirmRidePopupPanel, setri
                         </button>
                         <button
                             type="submit"
-                            className="flex-[2] py-3.5 bg-green-600 text-white font-bold text-sm rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/25 flex items-center justify-center gap-2"
+                            disabled={loading}
+                            className="flex-[2] py-3.5 bg-green-600 text-white font-bold text-sm rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/25 flex items-center justify-center gap-2 disabled:opacity-60"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                                <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
-                            </svg>
-                            Confirm OTP
+                            {loading ? 'Verifying...' : (
+                                <>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                        <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
+                                    </svg>
+                                    Confirm OTP
+                                </>
+                            )}
                         </button>
                     </div>
                 </form>

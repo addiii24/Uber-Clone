@@ -93,4 +93,30 @@ const confirmride = async ({rideId, captainid}) => {
     }
 }
 
-export default { getFare, createride, confirmride };
+const startride = async ({rideId, otp, captainid}) => {
+    try {
+        if(!rideId || !otp){
+            throw new Error("All fields are required")
+        }
+
+        // Fetch ride FIRST before using it
+        const ride = await Ride.findOne({_id: rideId}).populate("user").populate("captain").select('+otp');
+
+        if(!ride){
+            throw new Error("Ride not found");
+        }
+
+        if(ride.otp !== otp){
+            throw new Error("Invalid OTP");
+        }
+
+        ride.status = "ongoing";
+        await ride.save();
+
+        return ride;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export default { getFare, createride, confirmride, startride };

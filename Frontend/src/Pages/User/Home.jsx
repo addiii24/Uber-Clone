@@ -46,6 +46,16 @@ const Home = () => {
     return () => socket.off('ride-confirmed')
   }, [socket])
 
+  useEffect(() => {
+    socket.on("ride-started", (ride) => {
+      setShowWaiting(false)
+      setShowLooking(false)
+      setShowConfirm(false)
+      navigate('/riding', { state: { confirmedRide: ride } })
+    })
+    return () => socket.off('ride-started')
+  }, [socket])
+    
   
 
   // Ride options data
