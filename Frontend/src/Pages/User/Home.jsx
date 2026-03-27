@@ -8,6 +8,7 @@ import Waitingfordriver from '../../Components/Waitingfordriver'
 import { SocketContext } from '../../Context/Socketiocontext'
 import { UserDataContext } from '../../Context/Usercontext'
 import Livetracking from '../../Components/Livetracking'
+import UserProfilePanel from '../../Components/UserProfilePanel'
 
 const Home = () => {
   // Ride options data
@@ -63,6 +64,7 @@ const Home = () => {
   const [distanceTime, setDistanceTime] = useState(null)
   const [captainLocation, setCaptainLocation] = useState(null)
   const [captainEta, setCaptainEta] = useState(null)
+  const [showProfilePanel, setShowProfilePanel] = useState(false)
 
   const navigate = useNavigate()
   const panelRef = useRef(null)
@@ -328,14 +330,14 @@ const Home = () => {
 
 
 
-      {/* ===== MENU BUTTON ===== */}
-      <button className="absolute top-6 right-6 z-20 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
-        onClick={() => navigate('/logout')}
-        title="Logout"
+      {/* ===== PROFILE MENU BUTTON ===== */}
+      <button className="absolute top-6 right-6 z-20 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all cursor-pointer border-2 border-gray-100 overflow-hidden"
+        onClick={() => setShowProfilePanel(true)}
+        title="Profile"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-        </svg>
+        <div className="w-full h-full bg-black text-white flex items-center justify-center text-lg font-bold capitalize">
+            {user?.fullname?.firstname?.charAt(0)}{user?.fullname?.lastname?.charAt(0)}
+        </div>
       </button>
 
       {/* ===== BOTTOM PANEL ===== */}
@@ -599,6 +601,10 @@ const Home = () => {
           )}
         </div>
       </div>
+      {/* ===== PROFILE PANEL ===== */}
+      {showProfilePanel && (
+        <UserProfilePanel onClose={() => setShowProfilePanel(false)} />
+      )}
     </div>
   )
 }

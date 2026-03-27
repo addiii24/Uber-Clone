@@ -131,4 +131,13 @@ const endRide = async (req, res) => {
     }
 }
 
-export {createRide, getFare, confirmRide, startRide, endRide} ; 
+const getUserRideHistory = async (req, res) => {
+    try {
+        const rides = await rideService.getUserRideHistory({userid: req.user._id});
+        res.status(200).json({success: true, rides});
+    } catch (error) {
+        res.status(500).json({success: false, message: error.message});
+    }
+}
+
+export {createRide, getFare, confirmRide, startRide, endRide, getUserRideHistory} ; 

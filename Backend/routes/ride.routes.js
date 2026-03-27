@@ -2,7 +2,7 @@ import express from "express";
 import {body, query} from "express-validator";
 import {authuser} from "../middleware/auth.middleware.js";
 import {authcaptain} from "../middleware/captainauth.middleware.js"
-import {createRide, getFare, confirmRide, startRide, endRide} from "../controller/ride.controller.js";
+import {createRide, getFare, confirmRide, startRide, endRide, getUserRideHistory} from "../controller/ride.controller.js";
 
 const router = express.Router();
 
@@ -32,5 +32,7 @@ router.post("/end-ride",authcaptain,
     body("rideId").isString().notEmpty().withMessage("Ride ID is required"),
     endRide
 )
+
+router.get("/history", authuser, getUserRideHistory);
 
 export default router;

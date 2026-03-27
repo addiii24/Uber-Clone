@@ -93,7 +93,6 @@ export const login = async (req, res) => {
 }
 
 export const userprofile = async (req, res) => {
-    
     res.status(200).json({ 
         message: "User profile fetched successfully", 
         user: req.user
@@ -121,7 +120,61 @@ export const logout = async (req,res) => {
    }
    catch(error){
          res.status(500).json({ message: error.message });
-
    }
 }
-        
+
+export const updateProfile = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        const { firstname, lastname, email, mobile } = req.body;
+        const userId = req.user._id;
+
+        const updateData = {};
+        if (firstname || lastname) {
+            updateData.fullname = {
+                firstname: firstname || req.user?.fullname?.firstname,
+                lastname: lastname || req.user?.fullname?.lastname
+            };
+        }
+        if (email) updateData.email = email;
+        if (mobile) updateData.mobile = mobile;
+
+        const updatedUser = await userModel.findByIdAndUpdate(userId, updateData, { new: true, runValidators: true });
+
+        res.status(200).json({
+            message: "Profile updated successfully",
+            user: updatedUser
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const deleteAccount = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        // Delete the user
+        await userModel.findByIdAndDelete(userId);
+
+        // Blacklist token
+        const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+        if (token) {
+            await blacklistTokenModel.findOneAndUpdate(
+                { token },
+                { token },
+                { upsert: true }
+            );
+        }
+
+        res.clearCookie("token");
+
+        res.status(200).json({ message: "Account deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}

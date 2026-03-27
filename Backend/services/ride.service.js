@@ -156,4 +156,16 @@ const endride = async ({rideId, captainid}) => {
     }
 }
 
-export default { getFare, createride, confirmride, startride, endride };
+const getUserRideHistory = async ({userid}) => {
+    try {
+        if(!userid){
+            throw new Error("User ID is required");
+        }
+        const rides = await Ride.find({ user: userid }).populate("captain").sort({ createdAt: -1 });
+        return rides;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export default { getFare, createride, confirmride, startride, endride, getUserRideHistory };
