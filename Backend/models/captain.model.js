@@ -77,6 +77,12 @@ const captainSchema = new mongoose.Schema({
             type: [Number], // [longitude, latitude]
             required: false
         }
+    },
+
+    stats: {
+        totalRides: { type: Number, default: 0 },
+        totalEarnings: { type: Number, default: 0 },
+        totalDistance: { type: Number, default: 0 }
     }
 
 }, { timestamps: true });

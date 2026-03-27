@@ -81,7 +81,14 @@ const confirmRide = async (req, res) => {
         const captainid = req.captain._id;
         const ride = await rideService.confirmride({rideId, captainid});
 
-        SendMessageToSocketid(ride.user.socketId, "ride-confirmed", ride);
+        console.log(`✅ Ride confirmed. User: ${ride.user?._id}, SocketId: ${ride.user?.socketId}`);
+
+        if (!ride.user?.socketId) {
+            console.warn("⚠️ No socketId for user — ride-confirmed event NOT sent!");
+        } else {
+            SendMessageToSocketid(ride.user.socketId, "ride-confirmed", ride);
+            console.log(`📤 ride-confirmed sent to socketId: ${ride.user.socketId}`);
+        }
 
         res.status(200).json({success: true, ride});
     } catch (error) {
@@ -97,9 +104,10 @@ const startRide = async (req, res) => {
         }
         const { rideId, otp } = req.query;
         const ride = await rideService.startride({rideId, otp, captainid: req.captain._id});
-        res.status(200).json({success: true, ride});
-
+        
         SendMessageToSocketid(ride.user.socketId, "ride-started", ride);
+
+        res.status(200).json({success: true, ride});
     } catch (error) {
         res.status(500).json({success: false, message: error.message});
     }

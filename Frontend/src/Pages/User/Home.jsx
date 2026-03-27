@@ -68,17 +68,31 @@ const Home = () => {
   const panelRef = useRef(null)
 
   const socket = useContext(SocketContext)
-  const {user} = useContext(UserDataContext)
+  const { user } = useContext(UserDataContext)
+
+  const user_id = user?._id;
 
   useEffect(() => {
-      if (!user?._id) return
-      socket.emit("join", { userId: user._id, userType: "user" })
-  }, [user])
+    if (!user_id || !socket) return
+
+    const joinSocket = () => {
+      socket.emit("join", { userId: user_id, userType: "user" })
+      console.log("📡 User joined socket:", user_id, socket.id)
+    }
+
+    joinSocket() // Join immediately
+    socket.on('connect', joinSocket) // Re-join on reconnect
+
+    return () => socket.off('connect', joinSocket)
+  }, [user_id, socket])
 
   useEffect(() => {
     socket.on('ride-confirmed', (ride) => {
-      setConfirmedRide(ride)   // backend ride object (has captain, fare, user etc.)
-      setSelectedRide(ride.vehicleType) // ensure UI knows which vehicle is used
+      console.log("✅ ride-confirmed received:", ride?._id, "vehicleType:", ride?.vehicleType)
+      setConfirmedRide(ride)
+      if (ride.vehicleType) {
+        setSelectedRide(ride.vehicleType)
+      }
       setShowLooking(false)
       setShowWaiting(true)
     })
@@ -91,13 +105,13 @@ const Home = () => {
       setShowWaiting(false)
       setShowLooking(false)
       setShowConfirm(false)
-      navigate('/riding', { 
-        state: { 
-          confirmedRide: ride, 
+      navigate('/riding', {
+        state: {
+          confirmedRide: ride,
           pickup: ride.pickup,
           dropoff: ride.destination,
           ride: rides.find(r => r.id === ride.vehicleType)
-        } 
+        }
       })
     })
     return () => socket.off('ride-started')
@@ -106,7 +120,7 @@ const Home = () => {
   useEffect(() => {
     socket.on('captain-location', async (data) => {
       setCaptainLocation(data.location)
-      
+
       // Calculate real ETA from Captain to Pickup
       if (showWaiting && pickup) {
         try {
@@ -129,8 +143,8 @@ const Home = () => {
     })
     return () => socket.off('captain-location')
   }, [socket, showWaiting, pickup])
-    
-  
+
+
 
   // Saved locations
   const savedLocations = [
@@ -161,13 +175,13 @@ const Home = () => {
   const handleUpdateAddress = (type) => {
     const newAddress = window.prompt(`Enter your ${type} address:`);
     if (newAddress !== null && newAddress.trim() !== '') {
-        if (type === 'home') {
-            setHomeAddress(newAddress);
-            localStorage.setItem('homeAddress', newAddress);
-        } else {
-            setWorkAddress(newAddress);
-            localStorage.setItem('workAddress', newAddress);
-        }
+      if (type === 'home') {
+        setHomeAddress(newAddress);
+        localStorage.setItem('homeAddress', newAddress);
+      } else {
+        setWorkAddress(newAddress);
+        localStorage.setItem('workAddress', newAddress);
+      }
     }
   }
 
@@ -185,10 +199,10 @@ const Home = () => {
           params: { origin: pickup, destination: dropoff },
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         })
-        if(fareResponse.data.success) {
+        if (fareResponse.data.success) {
           setFare(fareResponse.data.fare)
         }
-        if(mapResponse.data.success) {
+        if (mapResponse.data.success) {
           setDistanceTime(mapResponse.data.data)
         }
       } catch (err) {
@@ -212,7 +226,7 @@ const Home = () => {
         params: { input: e.target.value },
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
-      if(response.data.success) {
+      if (response.data.success) {
         setPickupSuggestions(response.data.data)
       }
     } catch {
@@ -228,7 +242,7 @@ const Home = () => {
         params: { input: e.target.value },
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
-      if(response.data.success) {
+      if (response.data.success) {
         setDestinationSuggestions(response.data.data)
       }
     } catch {
@@ -304,8 +318,8 @@ const Home = () => {
 
       {/* ===== MAP BACKGROUND ===== */}
       <div className="absolute inset-0 z-0" >
-       <Livetracking 
-          pickup={showWaiting ? `${captainLocation?.ltd},${captainLocation?.lng}` : pickup} 
+        <Livetracking
+          pickup={showWaiting ? `${captainLocation?.ltd},${captainLocation?.lng}` : pickup}
           destination={showWaiting ? pickup : dropoff}
         />
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/70 to-transparent" />
@@ -327,13 +341,12 @@ const Home = () => {
       {/* ===== BOTTOM PANEL ===== */}
       <div
         ref={panelRef}
-        className={`absolute left-0 right-0 z-30 bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] bottom-0 ${
-          showRides || showConfirm || showLooking || showWaiting 
-            ? 'h-[80%]' 
-            : panelOpen 
-              ? 'h-[95%]' 
+        className={`absolute left-0 right-0 z-30 bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] bottom-0 ${showRides || showConfirm || showLooking || showWaiting
+            ? 'h-[80%]'
+            : panelOpen
+              ? 'h-[95%]'
               : 'h-auto'
-        }`}
+          }`}
       >
         {/* Drag handle */}
         <div
@@ -345,16 +358,16 @@ const Home = () => {
 
         <div className="px-5 pb-6 h-[calc(100%-24px)] overflow-y-auto scrollbar-hide">
           {/* ===== WAITING FOR DRIVER VIEW ===== */}
-          {showWaiting || confirmedRide ? (
+          {showWaiting ? (
             <Waitingfordriver
-               ride={rides.find(r => r.id === (selectedRide || confirmedRide?.vehicleType))}
-               confirmedRide={confirmedRide}
-               pickup={pickup}
-               dropoff={dropoff}
-               onCancel={handleCancelWaiting}
-               distanceTime={distanceTime}
-               captainEta={captainEta}
-             />
+              ride={rides.find(r => r.id === (confirmedRide?.vehicleType || selectedRide))}
+              confirmedRide={confirmedRide}
+              pickup={pickup}
+              dropoff={dropoff}
+              onCancel={handleCancelWaiting}
+              distanceTime={distanceTime}
+              captainEta={captainEta}
+            />
           ) : showLooking && selectedRide ? (
             <Lookingforvehicle
               ride={rides.find(r => r.id === selectedRide)}
@@ -518,14 +531,14 @@ const Home = () => {
                         key={i}
                         className="flex items-center justify-between w-full py-3.5 border-b border-gray-100 last:border-0 hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors cursor-default"
                       >
-                        <div 
+                        <div
                           className="flex items-center gap-4 flex-1 cursor-pointer"
                           onClick={() => {
                             if (loc.subtitle.startsWith('Add your')) {
-                                handleUpdateAddress(loc.type)
+                              handleUpdateAddress(loc.type)
                             } else {
-                                if (activeField === 'pickup') setPickup(loc.subtitle)
-                                else setDropoff(loc.subtitle)
+                              if (activeField === 'pickup') setPickup(loc.subtitle)
+                              else setDropoff(loc.subtitle)
                             }
                           }}
                         >
@@ -537,7 +550,7 @@ const Home = () => {
                             <p className="text-xs text-gray-400 mt-0.5">{loc.subtitle}</p>
                           </div>
                         </div>
-                        <button 
+                        <button
                           onClick={() => handleUpdateAddress(loc.type)}
                           className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
                           title="Edit Address"

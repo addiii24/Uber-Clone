@@ -100,8 +100,12 @@ export const SendMessageToSocketid = (socketId, eventName = "message", payload) 
     throw new Error("Socket.io is not initialized.");
   }
 
-  if (!socketId) return false;
+  if (!socketId) {
+    console.warn(`⚠️ Cannot send '${eventName}': socketId is missing`);
+    return false;
+  }
 
+  console.log(`📡 [SERVER -> CLIENT] Event: '${eventName}' | To Socket: ${socketId} | Payload type: ${typeof payload}`);
   io.to(String(socketId)).emit(eventName, payload);
   return true;
-};
+};

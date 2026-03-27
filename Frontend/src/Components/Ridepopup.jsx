@@ -101,9 +101,8 @@ const Ridepopup = ({ ride, distanceTime, setridePopupPanel, setConfirmRidePopupP
           Decline
         </button>
         <button
-         onClick={()=>{
+         onClick={() => {
             confirmRide()
-            setConfirmRidePopupPanel(true)
           }}
           className="flex-[2] py-3.5 bg-green-600 text-white font-bold text-sm rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/25 flex items-center justify-center gap-2"
         >

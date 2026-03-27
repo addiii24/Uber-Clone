@@ -4,6 +4,7 @@ import axios from "axios";
 import dotenv from "dotenv";
 import crypto from "crypto";
 dotenv.config();
+import captainModel from "../models/captain.model.js";
 
 const getFare = async (pickup, destination) => {
     if(!pickup || !destination){

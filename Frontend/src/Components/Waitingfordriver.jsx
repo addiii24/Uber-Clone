@@ -30,6 +30,9 @@ const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel, dist
     }
   }
 
+  // Guard: the ride object must be resolved before rendering
+  if (!ride) return null
+
   const handleStartRide = () => {
     navigate('/riding', {
       state: { ride, pickup, dropoff, captain, confirmedRide, distanceTime }
@@ -150,7 +153,7 @@ const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel, dist
           <div className="flex justify-between">
             <span className="text-sm text-gray-500">Fare</span>
             <div>
-                          <span className="text-sm font-bold text-gray-900">₹{confirmedRide?.fare || ride?.price}</span>
+              <span className="text-sm font-bold text-gray-900">₹{confirmedRide?.fare || ride?.price}</span>
               {!confirmedRide && ride?.originalPrice && (
                 <span className="text-xs text-gray-400 line-through ml-1.5">₹{ride.originalPrice}</span>
               )}
