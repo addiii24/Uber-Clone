@@ -129,7 +129,7 @@ const endride = async ({rideId, captainid}) => {
              status: "completed"
             });
 
-        const ride = await Ride.findOne({_id: rideId}).populate("user").populate("captain").select('+otp');
+        const ride = await Ride.findOne({_id: rideId, captain: captainid}).populate("user").populate("captain");
         if(!ride){
             throw new Error("Ride not found");
         }

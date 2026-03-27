@@ -113,9 +113,11 @@ const endRide = async (req, res) => {
         }
         const { rideId } = req.body;
         const ride = await rideService.endride({rideId, captainid: req.captain._id});
+        SendMessageToSocketid(ride.user.socketId, "ride-ended", ride);
+        
         res.status(200).json({success: true, ride});
 
-        SendMessageToSocketid(ride.user.socketId, "ride-ended", ride);
+
     } catch (error) {
         res.status(500).json({success: false, message: error.message});
     }

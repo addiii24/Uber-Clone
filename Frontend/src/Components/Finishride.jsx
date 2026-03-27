@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const Finishride = ({ ride, distanceTime, setFinishRidePanel }) => {
 
@@ -13,6 +14,22 @@ const Finishride = ({ ride, distanceTime, setFinishRidePanel }) => {
       const dropoff   = ride?.destination || 'Dropoff'
       const distance  = distanceTime?.distance?.text || '—'
       const duration  = distanceTime?.duration?.text || '—'
+
+
+     const endRide = async () => {
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/ride/end-ride`,
+          { rideId: ride._id },
+          { headers: { Authorization: `Bearer ${localStorage.getItem('captain-token')}` } }
+        )
+        if (response.data.success) {
+          navigate('/captain-home')
+        }
+      } catch (error) {
+        console.error('End ride failed:', error.response?.data || error.message)
+      }
+     }
       
 
   return (
@@ -93,7 +110,7 @@ const Finishride = ({ ride, distanceTime, setFinishRidePanel }) => {
                 <div className="flex gap-3">
                     <button
                         type="button"
-                        onClick={() => navigate('/captain-home')}
+                        onClick={endRide}
                             className="flex-1 py-3.5 bg-green-600 text-white font-bold text-sm rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/25 flex items-center justify-center gap-2"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">

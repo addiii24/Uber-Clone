@@ -1,9 +1,29 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { SocketContext } from '../../Context/Socketiocontext'
+import { UserDataContext } from '../../Context/Usercontext'
 
 const Riding = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const socket = useContext(SocketContext)         // direct — SocketContext provides the socket itself
+  const { user } = useContext(UserDataContext)     // for re-emitting join
+
+  // Re-emit join so DB has the current socketId while on this page
+  useEffect(() => {
+    if (!socket || !user?._id) return
+    socket.emit('join', { userId: user._id, userType: 'user' })
+  }, [socket, user])
+
+  // Navigate home when captain ends the ride
+  useEffect(() => {
+    if (!socket) return
+    socket.on("ride-ended", (data) => {
+      console.log('ride-ended received:', data)
+      navigate("/home")
+    })
+    return () => socket.off("ride-ended")
+  }, [socket])
 
   // Get ride data from navigation state or use defaults
   const {
@@ -217,10 +237,7 @@ const Riding = () => {
 
         {/* Pay button */}
         <button
-          onClick={() => {
-            alert(`Payment of ₹${displayFare} completed!\nThank you for riding with Uber.`)
-            navigate('/home')
-          }}
+          onClick={() => navigate('/home')}
           className="w-full py-4 bg-green-600 text-white font-bold text-base rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-green-600/25 flex items-center justify-center gap-2"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
