@@ -7,6 +7,7 @@ import { CaptainDataContext } from '../../Context/Captaincontext.jsx'
 
 const Captainsignup = () => {
   const [email, setemail] = useState("")
+  const [mobile, setMobile] = useState("")
   const [password, setpassword] = useState("")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
@@ -29,6 +30,7 @@ const Captainsignup = () => {
         lastname: lastName
       },
       email: email,
+      mobile: mobile,
       password: password,
       vehicle: {
         color: vehicleColor,
@@ -45,6 +47,7 @@ const Captainsignup = () => {
         setCaptain(data.captain)
         localStorage.setItem('captain-token', data.token)
         setemail('')
+        setMobile('')
         setFirstName('')
         setLastName('')
         setpassword('')
@@ -96,6 +99,16 @@ const Captainsignup = () => {
             className='bg-[#eeeeee] mb-6 rounded-lg px-4 py-2 border w-full text-base placeholder:text-sm outline-none focus:ring-2 focus:ring-black'
             type="email"
             placeholder='email@example.com'
+          />
+
+          <h3 className='text-base font-medium mb-2'>What's our Captain's mobile?</h3>
+          <input
+            required
+            value={mobile}
+            onChange={(e) => setMobile(e.target.value)}
+            className='bg-[#eeeeee] mb-6 rounded-lg px-4 py-2 border w-full text-base placeholder:text-sm outline-none focus:ring-2 focus:ring-black'
+            type="tel"
+            placeholder='1234567890'
           />
 
           <h3 className='text-base font-medium mb-2'>Enter Password</h3>

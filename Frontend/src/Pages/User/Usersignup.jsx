@@ -9,6 +9,7 @@ const Usersignup = () => {
    const [password, setpassword] = useState("")
    const [firstName, setFirstName] = useState("")
    const [lastName, setLastName] = useState("")
+   const [mobile, setMobile] = useState("")
 
 
    const navigate = useNavigate();
@@ -22,6 +23,7 @@ const Usersignup = () => {
         firstname: firstName,
         lastname: lastName
       },
+      mobile: mobile,
       email : email,
       password : password
     }
@@ -36,6 +38,7 @@ const Usersignup = () => {
         setFirstName('')
         setLastName('')
         setpassword('')
+        setMobile('')
         navigate('/home')
       }
     } catch (error) {
@@ -69,6 +72,16 @@ const Usersignup = () => {
               placeholder='Last name' 
             />
           </div>
+
+           <h3 className='text-base font-medium mb-2'>What's our user mobile?</h3>
+          <input
+            required
+            value={mobile}
+            onChange={(e) => setMobile(e.target.value)}
+            className='bg-[#eeeeee] mb-6 rounded-lg px-4 py-2 border w-full text-base placeholder:text-sm outline-none focus:ring-2 focus:ring-black'
+            type="tel"
+            placeholder='1234567890'
+          />
 
           <h3 className='text-base font-medium mb-2'>What's your email?</h3>
           <input 

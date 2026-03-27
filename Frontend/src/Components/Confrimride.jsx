@@ -135,11 +135,11 @@ const ConfirmRide = ({ ride, fare, distanceTime, pickup, dropoff, onBack, onConf
       {/* Payment method */}
       <div className="flex items-center gap-3 px-1 mb-4">
         <div className="flex items-center gap-2.5 flex-1">
-          <div className="w-9 h-6 bg-gradient-to-r from-blue-600 to-blue-400 rounded-md flex items-center justify-center shadow-sm">
-            <span className="text-white text-[8px] font-bold tracking-wider">VISA</span>
+          <div className="w-9 h-6 bg-gradient-to-r from-green-600 to-green-400 rounded-md flex items-center justify-center shadow-sm">
+            <span className="text-white text-[8px] font-bold tracking-wider">Cash</span>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">•••• 4242</p>
+            <p className="text-sm font-medium text-gray-900">Cash</p>
             <p className="text-[10px] text-gray-400">Payment method</p>
           </div>
         </div>

@@ -1,8 +1,8 @@
 import userModel from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 
-const createuser = async (firstname, lastname, email, password) => {
-    if (!firstname || !email || !password) {
+const createuser = async (firstname, lastname, email, password,mobile) => {
+    if (!firstname || !email || !password || !mobile) {
         throw new Error("All fields are required");
     }
 
@@ -19,6 +19,7 @@ const createuser = async (firstname, lastname, email, password) => {
             lastname: lastname || ""
         }, 
         email: email,
+        mobile: mobile,
         password: hashed
     });
     // await user.save();

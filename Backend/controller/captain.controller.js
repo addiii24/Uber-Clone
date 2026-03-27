@@ -11,7 +11,7 @@ export const registercaptain = async (req, res, next) => {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fullname, email, password, vehicle } = req.body;
+    const { fullname, email, mobile, password, vehicle } = req.body;
 
     const iscpatainAlreadyexist = await captainModel.findOne({ email });
     if (iscpatainAlreadyexist) {
@@ -34,6 +34,7 @@ export const registercaptain = async (req, res, next) => {
             fn,
             ln,
             email,
+            mobile,
             password,
             vehicle.color,
             vehicle.plate,

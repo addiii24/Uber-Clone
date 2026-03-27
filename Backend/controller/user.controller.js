@@ -11,7 +11,7 @@ export const registerUser = async (req, res) => {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { firstname, lastname, fullname, email, password } = req.body;
+    const { firstname, lastname, fullname, email, password,mobile } = req.body;
 
     const isuserAlreadyexist = await userModel.findOne({ email });
     if(isuserAlreadyexist){
@@ -30,7 +30,7 @@ export const registerUser = async (req, res) => {
     }
 
     try {
-        const user = await createuser(fn, ln, email, password);
+        const user = await createuser(fn, ln, email, password, mobile);
         // Generate token directly here instead of using model method
         const token = jwt.sign(
             { id: user._id }, 

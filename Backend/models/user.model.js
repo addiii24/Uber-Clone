@@ -30,6 +30,14 @@ const userSchema = new mongoose.Schema({
         required : true,
         select : false
     },
+    mobile : {
+        type:  String,
+        required : true,
+        unique : true,
+        trim : true,
+        minlength : [10, "Mobile number must be at least 10 digits long"],
+        maxlength : [10, "Mobile number must be at most 10 digits long"]
+    },
     socketId : {
         type : String,
         default : ""

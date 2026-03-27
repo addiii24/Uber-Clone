@@ -1,8 +1,8 @@
 import captainModel from "../models/captain.model.js";
 import bcrypt from "bcryptjs";
 
-const createcaptain = async (firstname, lastname, email, password, color, plate, capacity, vehicletype) => {
-    if (!firstname || !email || !password  || !color || !plate || !capacity || !vehicletype) {
+const createcaptain = async (firstname, lastname, email, mobile, password, color, plate, capacity, vehicletype) => {
+    if (!firstname || !email || !mobile || !password  || !color || !plate || !capacity || !vehicletype) {
         throw new Error("All fields are required");
     }
 
@@ -19,6 +19,7 @@ const createcaptain = async (firstname, lastname, email, password, color, plate,
             lastname: lastname || ""
         }, 
         email: email,
+        mobile: mobile,
         password: hashed,
         vehicle: {
             color: color,

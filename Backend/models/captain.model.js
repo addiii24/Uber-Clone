@@ -26,6 +26,15 @@ const captainSchema = new mongoose.Schema({
         match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     },
 
+    mobile: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        minlength: [10, "Mobile number must be at least 10 digits long"],
+        maxlength: [10, "Mobile number must be at most 10 digits long"]
+    },
+
     password: {
         type: String,
         required: true,
