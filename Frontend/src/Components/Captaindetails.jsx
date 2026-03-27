@@ -16,11 +16,9 @@ const Captaindetails = ({ setRidePopupPanel, captainData }) => {
     <div> 
         {/* Captain info row */}
         <div className="flex items-center gap-3 mb-5">
-          <img
-            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80"
-            alt={captainData?.fullname?.firstname}
-            className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md"
-          />
+          <div className="w-14 h-14 rounded-full bg-black text-white flex items-center justify-center text-xl font-bold capitalize border-2 border-white shadow-md shrink-0">
+            {(captainData?.fullname?.firstname?.charAt(0) || '?').toUpperCase()}{(captainData?.fullname?.lastname?.charAt(0) || '').toUpperCase()}
+          </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-base font-bold text-gray-900 truncate">{`${captainData?.fullname?.firstname || 'Captain'} ${captainData?.fullname?.lastname || ''}`.trim()}</h3>
             <p className="text-xs text-gray-500">{captainData?.vehicle?.color || 'No color'} {captainData?.vehicle?.name || captainData?.vehicle?.vehicletype || 'Vehicle'}</p>

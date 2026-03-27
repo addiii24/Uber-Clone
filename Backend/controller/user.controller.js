@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import userModel from "../models/user.model.js";
 import blacklistTokenModel from "../models/blacklistToken.model.js";
 import cookieParser from "cookie-parser";
+import { sendOtpEmail, verifyOtpToken } from "../services/otp.service.js";
 
 export const registerUser = async (req, res) => {
     const errors = validationResult(req);
@@ -178,3 +179,29 @@ export const deleteAccount = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+export const sendOtp = async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+    }
+    try {
+        await sendOtpEmail(email);
+        res.status(200).json({ message: "OTP sent successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const verifyOtp = async (req, res) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+        return res.status(400).json({ message: "Email and OTP are required" });
+    }
+    try {
+        await verifyOtpToken(email, otp);
+        res.status(200).json({ message: "OTP verified successfully" });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

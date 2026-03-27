@@ -9,6 +9,7 @@ import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { SocketContext } from '../../Context/Socketiocontext'
 import { CaptainDataContext } from '../../Context/Captaincontext'
+import CaptainProfilePanel from '../../Components/CaptainProfilePanel'
 
 
 
@@ -21,6 +22,7 @@ const Captainhome = () => {
   const [captainData, setCaptainData] = useState(null)
   const [ride, setRide] = useState(null)
   const [distanceTime, setDistanceTime] = useState(null)
+  const [showProfilePanel, setShowProfilePanel] = useState(false)
   const ridePopupPanelRef = useRef(null)
   const captainPanelRef = useRef(null)
   const confirmRidePopupPanelRef = useRef(null)
@@ -193,15 +195,15 @@ const Captainhome = () => {
             alt="Uber"
           />
 
-          {/* Logout button - top right */}
+          {/* Avatar / Profile button - top right */}
           <button
-            onClick={() => navigate('/captain-logout')}
-            className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
-            title="Logout"
+            onClick={() => setShowProfilePanel(true)}
+            className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all cursor-pointer border-2 border-gray-100 overflow-hidden"
+            title="Profile"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-            </svg>
+            <div className="w-full h-full bg-black text-white flex items-center justify-center text-lg font-bold capitalize">
+              {captain?.fullname?.firstname?.charAt(0)}{captain?.fullname?.lastname?.charAt(0)}
+            </div>
           </button>
         </div>
 
@@ -278,8 +280,12 @@ const Captainhome = () => {
           <Confirmridepopup ride={ride} setConfirmRidePopupPanel={setConfirmRidePopupPanel} setRidePopupPanel={setRidePopupPanel}/>
         </div>
       </div>
-    </div>
 
+      {/* ===== CAPTAIN PROFILE PANEL ===== */}
+      {showProfilePanel && (
+        <CaptainProfilePanel onClose={() => setShowProfilePanel(false)} />
+      )}
+    </div>
   )
 }
 

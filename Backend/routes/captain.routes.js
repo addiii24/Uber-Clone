@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 import { body } from "express-validator";
-import { registercaptain, logincaptain, captainprofile,logoutcaptain } from "../controller/captain.controller.js";
+import { registercaptain, logincaptain, captainprofile, logoutcaptain, updateCaptainProfile, deleteCaptainAccount } from "../controller/captain.controller.js";
 import { authcaptain } from "../middleware/captainauth.middleware.js";
 
 router.post("/register",
@@ -24,5 +24,14 @@ router.post("/login", [
 router.get("/profile",authcaptain,captainprofile);
 
 router.post("/logout",authcaptain,logoutcaptain);
+
+router.put("/update-profile", authcaptain, [
+    body("email").optional().isEmail().withMessage("Invalid email format"),
+    body("firstname").optional().isLength({ min: 3 }).withMessage("First name must be at least 3 characters"),
+    body("lastname").optional().isLength({ min: 3 }).withMessage("Last name must be at least 3 characters"),
+    body("mobile").optional().isLength({ min: 10, max: 10 }).withMessage("Mobile must be 10 digits"),
+], updateCaptainProfile);
+
+router.delete("/delete-account", authcaptain, deleteCaptainAccount);
 
 export default router;

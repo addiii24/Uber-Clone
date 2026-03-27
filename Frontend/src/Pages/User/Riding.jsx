@@ -50,8 +50,8 @@ const Riding = () => {
     name: backendCaptain?.fullname
       ? `${backendCaptain.fullname.firstname} ${backendCaptain.fullname.lastname || ''}`.trim()
       : 'Your Captain',
+    initials: `${(backendCaptain?.fullname?.firstname?.charAt(0) || '?').toUpperCase()}${(backendCaptain?.fullname?.lastname?.charAt(0) || '').toUpperCase()}`,
     rating: 4.8,
-    photo: 'https://randomuser.me/api/portraits/men/32.jpg',
     vehicle: {
       name: backendCaptain?.vehicle?.vehicletype || ride.name || 'Vehicle',
       plate: backendCaptain?.vehicle?.plate || 'XX 00 XX 0000',
@@ -146,13 +146,8 @@ const Riding = () => {
         <div className="flex items-center gap-3 mb-4">
           {/* Driver + vehicle overlapping */}
           <div className="relative shrink-0">
-            <img
-              src={captain.photo}
-              alt={captain.name}
-              className="w-12 h-12 rounded-full object-cover border-2 border-white shadow"
-            />
-            <div className="absolute -bottom-1 -right-2 w-7 h-7 rounded-md overflow-hidden border-2 border-white shadow bg-gray-100">
-              <img src={ride.image} alt={ride.name} className="w-full h-full object-cover" />
+            <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center text-lg font-bold border-2 border-white shadow">
+              {captain.initials}
             </div>
           </div>
 

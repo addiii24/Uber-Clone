@@ -140,3 +140,56 @@ export const logoutcaptain = async (req,res) => {
    }
 }
 
+export const updateCaptainProfile = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+        const { firstname, lastname, email, mobile, vehicleColor, vehiclePlate, vehicleCapacity, vehicleType } = req.body;
+        const captainId = req.captain._id;
+
+        const updateData = {};
+        if (firstname || lastname) {
+            updateData.fullname = {
+                firstname: firstname || req.captain?.fullname?.firstname,
+                lastname: lastname || req.captain?.fullname?.lastname
+            };
+        }
+        if (email) updateData.email = email;
+        if (mobile) updateData.mobile = mobile;
+        if (vehicleColor || vehiclePlate || vehicleCapacity || vehicleType) {
+            updateData.vehicle = {
+                color: vehicleColor || req.captain?.vehicle?.color,
+                plate: vehiclePlate || req.captain?.vehicle?.plate,
+                capacity: vehicleCapacity || req.captain?.vehicle?.capacity,
+                vehicletype: vehicleType || req.captain?.vehicle?.vehicletype
+            };
+        }
+
+        const updatedCaptain = await captainModel.findByIdAndUpdate(captainId, updateData, { new: true, runValidators: true });
+        res.status(200).json({ message: "Profile updated successfully", captain: updatedCaptain });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteCaptainAccount = async (req, res) => {
+    try {
+        const captainId = req.captain._id;
+        await captainModel.findByIdAndDelete(captainId);
+
+        const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+        if (token) {
+            await blacklistTokenModel.findOneAndUpdate(
+                { token },
+                { token },
+                { upsert: true }
+            );
+        }
+        res.clearCookie("token");
+        res.status(200).json({ message: "Captain account deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

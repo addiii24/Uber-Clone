@@ -1,4 +1,4 @@
-import { registerUser,login,userprofile,logout, updateProfile, deleteAccount } from "../controller/user.controller.js";   
+import { registerUser,login,userprofile,logout, updateProfile, deleteAccount, sendOtp, verifyOtp } from "../controller/user.controller.js";   
 import express from "express";
 const router = express.Router();
 import { body } from "express-validator";
@@ -30,5 +30,14 @@ router.put("/update-profile", authuser, [
 ], updateProfile);
 
 router.delete("/delete-account", authuser, deleteAccount);
+
+router.post("/send-otp", [
+    body("email").isEmail().withMessage("Invalid email format")
+], sendOtp);
+
+router.post("/verify-otp", [
+    body("email").isEmail().withMessage("Invalid email format"),
+    body("otp").isLength({ min: 6, max: 6 }).withMessage("Invalid OTP length")
+], verifyOtp);
 
 export default router;

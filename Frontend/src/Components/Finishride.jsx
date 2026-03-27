@@ -44,11 +44,9 @@ const Finishride = ({ ride, distanceTime, setFinishRidePanel }) => {
 
                 {/* ===== Passenger info ===== */}
                 <div className="flex items-center gap-3 mb-4 mt-6">
-                    <img
-                        src="https://randomuser.me/api/portraits/women/44.jpg"
-                        alt={passengerName}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md"
-                    />
+                    <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center text-lg font-bold shrink-0 border-2 border-white shadow-md">
+                        {(ride?.user?.fullname?.firstname?.charAt(0) || '?').toUpperCase()}{(ride?.user?.fullname?.lastname?.charAt(0) || '').toUpperCase()}
+                    </div>
                     <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-bold text-gray-900 truncate">{passengerName}</h3>
                     </div>

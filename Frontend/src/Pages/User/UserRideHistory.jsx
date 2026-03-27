@@ -97,8 +97,8 @@ const UserRideHistory = () => {
                             
                             {ride.captain && (
                                 <div className="mt-2 pt-3 border-t border-gray-100 flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
-                                        <img src="https://i.pinimg.com/236x/af/26/28/af26280b0ca305be47df0b799ed1b12b.jpg" alt="Driver" className="w-full h-full object-cover" />
+                                    <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold capitalize shrink-0">
+                                        {(ride.captain.fullname.firstname?.charAt(0) || '').toUpperCase()}{(ride.captain.fullname.lastname?.charAt(0) || '').toUpperCase()}
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-gray-900">{ride.captain.fullname.firstname} {ride.captain.fullname.lastname}</p>
