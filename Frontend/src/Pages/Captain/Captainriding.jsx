@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import Finishride from '../../Components/Finishride'
+import Livetracking from '../../Components/Livetracking'
 
 const Captainriding = () => {
 
@@ -65,12 +66,11 @@ const Captainriding = () => {
 
       {/* ===== MAP AREA ===== */}
       <div className="relative flex-1 min-h-0">
-        <img
-          src="/map-bg.png"
-          alt="Map"
-          className="w-full h-4/5 object-cover"
+        <Livetracking
+          pickup={ride?.pickup}
+          destination={ride?.destination}
         />
-        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white/70 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white/60 to-transparent pointer-events-none" />
 
         {/* ===== TOP BAR ===== */}
         <div className="absolute top-5 left-5 right-5 z-20 flex items-center justify-between">
