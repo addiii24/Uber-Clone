@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import axios from 'axios'
 import Finishride from '../../Components/Finishride'
 import Livetracking from '../../Components/Livetracking'
 import { SocketContext } from '../../Context/Socketiocontext'
@@ -114,8 +115,8 @@ const Captainriding = () => {
             Authorization: `Bearer ${localStorage.getItem('captain-token')}`
           }
         })
-        if (response.data) {
-          setDistanceTime(response.data)
+        if (response.data.success && response.data.data) {
+          setDistanceTime(response.data.data)
         }
       } catch (err) {
         console.error("Error fetching distance:", err)

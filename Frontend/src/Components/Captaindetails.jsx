@@ -45,8 +45,8 @@ const Captaindetails = ({ setRidePopupPanel, captainData }) => {
                 <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z" clipRule="evenodd" />
               </svg>
             </div>
-            <h2 className="text-lg font-bold text-gray-900">10.2</h2>
-            <p className="text-[11px] text-gray-600 font-medium">Hours Online</p>
+            <h2 className="text-lg font-bold text-gray-900">10</h2>
+            <p className="text-[11px] text-gray-600 font-medium">Total Rides</p>
           </div>
 
           {/* Divider */}

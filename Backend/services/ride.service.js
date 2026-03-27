@@ -125,15 +125,30 @@ const endride = async ({rideId, captainid}) => {
             throw new Error("All fields are required")
         }
 
-        await Ride.findOneAndUpdate({_id: rideId},{
-             status: "completed"
-            });
-
+        // Get ride distance before updating status
         const ride = await Ride.findOne({_id: rideId, captain: captainid}).populate("user").populate("captain");
         if(!ride){
             throw new Error("Ride not found");
         }
-        
+
+        // Calculate distance traveled (pickup to destination)
+        const distanceTime = await getDistanceAndTime(ride.pickup, ride.destination);
+        const distanceInKm = distanceTime.distance.value / 1000; // Convert meters to km
+
+        // Update ride status to completed
+        await Ride.findOneAndUpdate({_id: rideId},{
+             status: "completed"
+            });
+
+        // Update captain stats
+        await captainModel.findByIdAndUpdate(captainid, {
+            $inc: {
+                'stats.totalRides': 1,
+                'stats.totalEarnings': ride.fare,
+                'stats.totalDistance': distanceInKm
+            }
+        });
+
         return ride;
     } catch (error) {
         throw error;

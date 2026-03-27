@@ -78,6 +78,7 @@ const Home = () => {
   useEffect(() => {
     socket.on('ride-confirmed', (ride) => {
       setConfirmedRide(ride)   // backend ride object (has captain, fare, user etc.)
+      setSelectedRide(ride.vehicleType) // ensure UI knows which vehicle is used
       setShowLooking(false)
       setShowWaiting(true)
     })
@@ -344,9 +345,9 @@ const Home = () => {
 
         <div className="px-5 pb-6 h-[calc(100%-24px)] overflow-y-auto scrollbar-hide">
           {/* ===== WAITING FOR DRIVER VIEW ===== */}
-          {showWaiting && selectedRide ? (
+          {showWaiting || confirmedRide ? (
             <Waitingfordriver
-               ride={rides.find(r => r.id === selectedRide)}
+               ride={rides.find(r => r.id === (selectedRide || confirmedRide?.vehicleType))}
                confirmedRide={confirmedRide}
                pickup={pickup}
                dropoff={dropoff}
