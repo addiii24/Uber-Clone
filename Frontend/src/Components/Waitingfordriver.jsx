@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel, distanceTime }) => {
+const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel, distanceTime, captainEta }) => {
   const [message, setMessage] = useState('')
   const navigate = useNavigate()
 
@@ -42,7 +42,7 @@ const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel, dist
       {/* ===== ETA Header ===== */}
       <div className="bg-black text-white rounded-2xl px-5 py-4 mb-5 text-center">
         <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Meeting at pickup point</p>
-        <h2 className="text-3xl font-bold mt-1">2 min</h2>
+        <h2 className="text-3xl font-bold mt-1">{captainEta || 'Calculating...'}</h2>
       </div>
 
       {/* ===== Captain Info Card ===== */}

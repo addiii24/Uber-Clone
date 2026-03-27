@@ -26,6 +26,8 @@ const Home = () => {
   const [confirmedRide, setConfirmedRide] = useState(null)  // backend ride from socket
   const [fare, setFare] = useState({})
   const [distanceTime, setDistanceTime] = useState(null)
+  const [captainLocation, setCaptainLocation] = useState(null)
+  const [captainEta, setCaptainEta] = useState(null)
 
   const navigate = useNavigate()
   const panelRef = useRef(null)
@@ -56,6 +58,33 @@ const Home = () => {
     })
     return () => socket.off('ride-started')
   }, [socket])
+
+  useEffect(() => {
+    socket.on('captain-location', async (data) => {
+      setCaptainLocation(data.location)
+      
+      // Calculate real ETA from Captain to Pickup
+      if (showWaiting && pickup) {
+        try {
+          const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/map/get-distance-time`, {
+            params: {
+              origin: `${data.location.ltd},${data.location.lng}`,
+              destination: pickup
+            },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          if (response.data && response.data.duration) {
+            setCaptainEta(response.data.duration.text)
+          }
+        } catch (err) {
+          console.error("Error fetching captain ETA:", err)
+        }
+      }
+    })
+    return () => socket.off('captain-location')
+  }, [socket, showWaiting, pickup])
     
   
 
@@ -266,18 +295,15 @@ const Home = () => {
 
       {/* ===== MAP BACKGROUND ===== */}
       <div className="absolute inset-0 z-0" >
-       <Livetracking pickup={pickup} destination={dropoff}/>
+       <Livetracking 
+          pickup={showWaiting ? `${captainLocation?.ltd},${captainLocation?.lng}` : pickup} 
+          destination={showWaiting ? pickup : dropoff}
+        />
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/70 to-transparent" />
 
       </div>
 
-      {/* ===== USER LOCATION MARKER ===== */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-        <div className="relative">
-          <div className="w-4 h-4 bg-black rounded-full border-[3px] border-white shadow-lg" />
-          <div className="absolute -top-1 -left-1 w-6 h-6 bg-black/20 rounded-full animate-ping" />
-        </div>
-      </div>
+
 
       {/* ===== MENU BUTTON ===== */}
       <button className="absolute top-6 right-6 z-20 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
@@ -312,13 +338,14 @@ const Home = () => {
           {/* ===== WAITING FOR DRIVER VIEW ===== */}
           {showWaiting && selectedRide ? (
             <Waitingfordriver
-              ride={rides.find(r => r.id === selectedRide)}
-              distanceTime={distanceTime}
-              confirmedRide={confirmedRide}
-              pickup={pickup}
-              dropoff={dropoff}
-              onCancel={handleCancelWaiting}
-            />
+               ride={rides.find(r => r.id === selectedRide)}
+               confirmedRide={confirmedRide}
+               pickup={pickup}
+               dropoff={dropoff}
+               onCancel={handleCancelWaiting}
+               distanceTime={distanceTime}
+               captainEta={captainEta}
+             />
           ) : showLooking && selectedRide ? (
             <Lookingforvehicle
               ride={rides.find(r => r.id === selectedRide)}

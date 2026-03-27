@@ -49,14 +49,22 @@ const pinSvg = (fill) => encodeURIComponent(
   </svg>`
 )
 
+const carSvg = encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+    <circle cx="24" cy="24" r="22" fill="white" stroke="#000" stroke-width="2"/>
+    <path d="M36 24c0-2.2-1.8-4-4-4H16c-2.2 0-4 1.8-4 4v4c0 1.1.9 2 2 2h2c0 1.1.9 2 2 2s2-.9 2-2h8c0 1.1.9 2 2 2s2-.9 2-2h2c1.1 0 2-.9 2-2v-4zM16 22h16c1.1 0 2 .9 2 2v2H14v-2c0-1.1.9-2 2-2z" fill="#000"/>
+  </svg>`
+)
+
 /**
  * Livetracking — colorful Google Map with live GPS, pickup/destination markers, and route.
  *
  * Props:
- *   pickup      {string}  — Pickup address (optional)
- *   destination {string}  — Destination address (optional)
+ *   pickup          {string}  — Pickup address (optional)
+ *   destination     {string}  — Destination address (optional)
+ *   captainLocation {object}  — {ltd, lng} (optional)
  */
-const Livetracking = ({ pickup, destination }) => {
+const Livetracking = ({ pickup, destination, captainLocation }) => {
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_API || '',
     libraries: MAP_LIBRARIES,
@@ -194,6 +202,19 @@ const Livetracking = ({ pickup, destination }) => {
               url: `data:image/svg+xml,${pinSvg('#ef4444')}`,
               scaledSize: new window.google.maps.Size(36, 48),
               anchor: new window.google.maps.Point(18, 48),
+            }}
+          />
+        )}
+
+        {/* ── Captain/Vehicle marker: Car icon ── */}
+        {captainLocation && captainLocation.ltd && (
+          <Marker
+            position={{ lat: captainLocation.ltd, lng: captainLocation.lng }}
+            title="Captain"
+            icon={{
+              url: `data:image/svg+xml,${carSvg}`,
+              scaledSize: new window.google.maps.Size(40, 40),
+              anchor: new window.google.maps.Point(20, 20),
             }}
           />
         )}

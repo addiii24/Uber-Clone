@@ -1,6 +1,7 @@
 import { Server as SocketIOServer } from "socket.io";
 import userModel from "./models/user.model.js";
 import captainModel from "./models/captain.model.js";
+import { Ride } from "./models/ride.model.js";
 
 let io;
 
@@ -63,6 +64,19 @@ export const initializeSocket = (httpServer) => {
         });
 
         console.log(`📍 Location updated for captain ${userId}`);
+
+        // 🚀 BROADCAST TO USER IF IN ACTIVE RIDE
+        const ride = await Ride.findOne({
+          captain: userId,
+          status: { $in: ['accepted', 'ongoing'] }
+        }).populate('user');
+
+        if (ride && ride.user && ride.user.socketId) {
+          io.to(ride.user.socketId).emit('captain-location', {
+            userId: userId,
+            location: location
+          });
+        }
 
       } catch (error) {
         console.error("Location update error:", error);
