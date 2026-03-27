@@ -7,6 +7,7 @@ import Lookingforvehicle from '../../Components/Lookingforvehicle'
 import Waitingfordriver from '../../Components/Waitingfordriver'
 import { SocketContext } from '../../Context/Socketiocontext'
 import { UserDataContext } from '../../Context/Usercontext'
+import Livetracking from '../../Components/Livetracking'
 
 const Home = () => {
   const [pickup, setPickup] = useState('')
@@ -265,15 +266,7 @@ const Home = () => {
 
       {/* ===== MAP BACKGROUND ===== */}
       <div className="absolute inset-0 z-0" >
-        <img onClick={(e) => {
-          setPanelOpen(false);
-        }}
-          src="/map-bg.png"
-          alt="Map"
-          className="w-full h-full object-cover"
-        />
-
-        
+       <Livetracking pickup={pickup} destination={dropoff}/>
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/70 to-transparent" />
 
       </div>

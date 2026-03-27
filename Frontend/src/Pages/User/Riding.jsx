@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { SocketContext } from '../../Context/Socketiocontext'
 import { UserDataContext } from '../../Context/Usercontext'
+import Livetracking from '../../Components/Livetracking'
 
 const Riding = () => {
   const navigate = useNavigate()
@@ -82,21 +83,18 @@ const Riding = () => {
     return () => clearInterval(etaTimer)
   }, [])
 
-  // SVG path for the route line
-  const routePath = "M 30 250 C 80 230, 100 180, 140 160 C 180 140, 200 100, 240 90 C 280 80, 320 110, 340 80 C 360 50, 370 30, 380 25"
+
 
   return (
     <div className="h-screen w-full max-w-md mx-auto relative overflow-hidden bg-gray-100 font-['Inter',sans-serif] flex flex-col">
 
-      {/* ===== MAP AREA (top half) ===== */}
+      {/* ===== MAP AREA ===== */}
       <div className="relative flex-1 min-h-0">
-        {/* Map background */}
-        <img
-          src="/map-bg.png"
-          alt="Map"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white/60 to-transparent" />
+        {/* Live Google Map */}
+        <Livetracking pickup={displayPickup} destination={displayDropoff} />
+
+        {/* Top gradient overlay */}
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/50 to-transparent pointer-events-none" />
 
         {/* Home button - top right */}
         <button
@@ -108,58 +106,6 @@ const Riding = () => {
             <path fillRule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" clipRule="evenodd" />
           </svg>
         </button>
-
-        {/* Animated route + vehicle */}
-        <svg
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 400 280"
-          preserveAspectRatio="xMidYMid slice"
-        >
-          {/* Route path */}
-          <path
-            d={routePath}
-            fill="none"
-            stroke="#111"
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeDasharray="8 6"
-            opacity="0.6"
-          />
-
-          {/* Pickup marker */}
-          <circle cx="30" cy="250" r="6" fill="#22c55e" stroke="white" strokeWidth="2" />
-          <text x="42" y="254" fontSize="9" fill="#333" fontWeight="600">Pickup</text>
-
-          {/* Dropoff marker */}
-          <rect x="374" y="19" width="12" height="12" rx="2" fill="#ef4444" stroke="white" strokeWidth="2" />
-          <text x="348" y="16" fontSize="9" fill="#333" fontWeight="600">Drop</text>
-
-          {/* Moving vehicle dot */}
-          <circle r="0" fill="black" opacity="0.15">
-            <animate
-              attributeName="r"
-              values="8;14;8"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-            <animateMotion
-              dur="30s"
-              repeatCount="indefinite"
-              path={routePath}
-            />
-          </circle>
-
-          {/* Vehicle marker */}
-          <g>
-            <animateMotion
-              dur="30s"
-              repeatCount="indefinite"
-              path={routePath}
-            />
-            <circle r="7" fill="#111" stroke="white" strokeWidth="3" />
-            <circle r="3" fill="white" />
-          </g>
-        </svg>
       </div>
 
       {/* ===== BOTTOM PANEL ===== */}
