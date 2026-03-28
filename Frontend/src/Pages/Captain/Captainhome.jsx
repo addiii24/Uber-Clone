@@ -55,7 +55,6 @@ const Captainhome = () => {
         userId: captain._id,
         userType: "captain"
       })
-      console.log("📡 Captain joined socket:", captain._id, socket.id)
     }
 
     joinSocket()
@@ -86,7 +85,6 @@ const Captainhome = () => {
 
   useEffect(() => {
     socket.on("new-ride", async (data) => {
-      console.log("new-ride", data)
       setRide(data)
       setRidePopupPanel(true)
       // Fetch real distance & duration for this ride
@@ -115,7 +113,6 @@ const Captainhome = () => {
       })
       setCaptainData(response.data?.user || response.data || null)
     } catch (error) {
-      console.log('fetchCaptain error', error)
       setCaptainData(null)
     }
   }

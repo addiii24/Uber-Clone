@@ -8,6 +8,7 @@ const Captainlogin = () => {
   const [email, setemail] = useState("")
   const [password, setpassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [authError, setAuthError] = useState("")
 
   const { captain, setCaptain } = useContext(CaptainDataContext)
   const navigate = useNavigate();
@@ -21,12 +22,10 @@ const Captainlogin = () => {
       password: password
     }
 
-    console.log(captainData)
+    setAuthError("")
 
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, captainData)
-
-      console.log(response)
 
       if (response.status === 200) {
         const data = response.data
@@ -37,7 +36,8 @@ const Captainlogin = () => {
         navigate('/captain-home')
       }
     } catch (error) {
-      console.error('Login error:', JSON.stringify(error.response?.data, null, 2) || error.message)
+      const msg = error.response?.data?.message || "Invalid email or password. Please try again."
+      setAuthError(msg)
     }
 
     setemail('')
@@ -81,6 +81,15 @@ const Captainlogin = () => {
             />
             <label htmlFor="showPassword" size='text-sm text-gray-600 cursor-pointer'>Show Password</label>
           </div>
+
+          {authError && (
+            <div className='flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-5 text-sm font-medium'>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 shrink-0 text-red-500">
+                <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-8-5a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 10 5Zm0 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clipRule="evenodd" />
+              </svg>
+              {authError}
+            </div>
+          )}
 
           <button
             type='submit'

@@ -25,7 +25,6 @@ const Waitingfordriver = ({ ride, confirmedRide, pickup, dropoff, onCancel, dist
   const handleSendMessage = (e) => {
     e.preventDefault()
     if (message.trim()) {
-      console.log('Message to captain:', message)
       setMessage('')
       alert('Message sent to captain!')
     }

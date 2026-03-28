@@ -20,8 +20,7 @@ const Riding = () => {
   // Navigate home when captain ends the ride
   useEffect(() => {
     if (!socket) return
-    socket.on("ride-ended", (data) => {
-      console.log('ride-ended received:', data)
+    socket.on("ride-ended", (_data) => {
       navigate("/home")
     })
     return () => socket.off("ride-ended")

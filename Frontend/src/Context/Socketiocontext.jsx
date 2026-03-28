@@ -14,15 +14,15 @@ const SocketProvider = ({ children }) => {
     useEffect(() => {
 
         socket.on('connect', () => {
-            console.log('✅ Connected:', socket.id);
+            // connected
         });
 
-        socket.on('disconnect', (reason) => {
-            console.log('❌ Disconnected:', reason);
+        socket.on('disconnect', (_reason) => {
+            // disconnected
         });
 
-        socket.on('connect_error', (err) => {
-            console.log('🚨 Connection Error:', err.message);
+        socket.on('connect_error', (_err) => {
+            // connection error
         });
 
         return () => {

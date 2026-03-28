@@ -79,7 +79,6 @@ const Home = () => {
 
     const joinSocket = () => {
       socket.emit("join", { userId: user_id, userType: "user" })
-      console.log("📡 User joined socket:", user_id, socket.id)
     }
 
     joinSocket() // Join immediately
@@ -90,7 +89,6 @@ const Home = () => {
 
   useEffect(() => {
     socket.on('ride-confirmed', (ride) => {
-      console.log("✅ ride-confirmed received:", ride?._id, "vehicleType:", ride?.vehicleType)
       setConfirmedRide(ride)
       if (ride.vehicleType) {
         setSelectedRide(ride.vehicleType)
@@ -103,7 +101,6 @@ const Home = () => {
 
   useEffect(() => {
     socket.on("ride-started", (ride) => {
-      console.log("🚀 Ride started:", ride);
       setShowWaiting(false)
       setShowLooking(false)
       setShowConfirm(false)
@@ -254,7 +251,6 @@ const Home = () => {
 
   const createride = async () => {
     try {
-      console.log("Creating ride with:", { pickup, destination: dropoff, vehicleType: selectedRide?.id })
       await axios.post(`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api'}/ride/create-ride`, {
         pickup,
         destination: dropoff,
